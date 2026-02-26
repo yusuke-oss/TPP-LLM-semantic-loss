@@ -107,7 +107,7 @@ class TPPLLMRunner(object):
             metrics = {
                 'batch_loss': batch_loss.float().cpu().item(),
                 'loss_tpp': loss_tpp.float().cpu().item(),
-                'semantic_loss': val_semantic_loss.float().cpu().item(),
+                'semantic_loss': val_semantic_loss,
                 'batch_event_nums': batch_event_nums.sum().item(),
                 'batch_log_likelihood': batch_log_likelihoods.sum().item() / batch_event_nums.sum().item(),
                 'learning_rate': self.optimizer.param_groups[0]['lr'],
