@@ -20,7 +20,7 @@ Official PyTorch implementation of TPP-LLM with MLP embedding method and semanti
 
 The following images provide visual representations of the TPP-LLM architecture and the Semantic Alignment concept.
 
-![TPP-LLM Architecture](images/tpp-llm_semantic_loss.png)
+![TPP-LLM Architecture](images)
 *Figure 1: The architecture of the TPP-LLM model.*
 
 ## Results
