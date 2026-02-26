@@ -4,11 +4,11 @@
 #   TPP-LLM Training Script
 # =========================================================
 
-# 実験に使用する乱数シード
+# Random seeds for experiments
 SEEDS=(42 123 501 1000 2025)
 
 # =========================================================
-#   パス・パラメータ設定 (各配列の要素数は一致させること)
+#   Path and Parameter Settings (Ensure array lengths match)
 # =========================================================
 
 BASE_DATASET_PATHS=(
@@ -27,11 +27,11 @@ BASE_WEIGHT_SAVE_PATHS=(
   "save_weight/us_earthquake_semantic_loss"
 )
 
-# 損失関数の係数設定 (Concept/Directional Loss)
+# Loss coefficient settings (Semantic Loss)
 BETA_SEMANTICS=(10000.0)
 
 # =========================================================
-#   実行ループ
+#   Execution Loop
 # =========================================================
 
 for seed in "${SEEDS[@]}"; do
@@ -39,29 +39,30 @@ for seed in "${SEEDS[@]}"; do
   echo " STARTING EXPERIMENTS FOR SEED: $seed "
   echo "========================================="
 
-  # 実験配列のインデックスをループ
+  # Loop through the indices of the experiment arrays
   for i in "${!BASE_RESULT_PATHS[@]}"; do
     
-    # 変数セットアップ
+    # Set up variables
     DATASET_PATH="${BASE_DATASET_PATHS[$i]}"
     CUR_BETA_S="${BETA_SEMANTICS[$i]}"
     
-    # パス生成 (すべてシードごとにディレクトリを分ける)
-    CUR_RESULT="${BASE_RESULT_PATHS[$i]}/seed_${seed}"
-    CUR_WEIGHT="${BASE_WEIGHT_SAVE_PATHS[$i]}/seed_${seed}"
-    CUR_MODEL_LOAD="${BASE_MODEL_LOAD_PATHS[$i]}/seed_${seed}"
+    # Generate paths (Create a folder for the coefficient, and a seed-specific directory inside it)
+    CUR_RESULT="${BASE_RESULT_PATHS[$i]}/beta_${CUR_BETA_S}/seed_${seed}"
+    CUR_WEIGHT="${BASE_WEIGHT_SAVE_PATHS[$i]}/beta_${CUR_BETA_S}/seed_${seed}"
+    CUR_MODEL_LOAD="${BASE_MODEL_LOAD_PATHS[$i]}/beta_${CUR_BETA_S}/seed_${seed}"
     
-    # ディレクトリ作成
+    # Create directories
     mkdir -p "$CUR_RESULT" "$CUR_WEIGHT" "$CUR_MODEL_LOAD"
 
     echo "-------------------------------------------------------"
     echo " Running Experiment Index: $i (Seed: $seed)"
     echo " Dataset: $DATASET_PATH"
     echo " Beta Semantic: $CUR_BETA_S"
+    echo " Output Dir: $CUR_RESULT"
     echo "-------------------------------------------------------"
 
-    # メイン学習スクリプトの実行
-    # temp.configは作成せず、直接引数で上書きして実行する
+    # Execute the main training script
+    # Arguments are passed directly to override the config file
     python "scripts/us_earthquake_semantic_loss/train_tpp_llm.py" \
       @configs/tpp_llm_ue.config \
       --dataset_path="${DATASET_PATH}" \
@@ -71,7 +72,7 @@ for seed in "${SEEDS[@]}"; do
       --seed="${seed}" \
       --beta_semantic="${CUR_BETA_S}"
 
-    echo ">>> Experiment $i (Seed: $seed) Completed."
+    echo ">>> Experiment $i (Seed: $seed, Beta: $CUR_BETA_S) Completed."
     echo ""
   done
 done

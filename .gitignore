@@ -206,7 +206,9 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
+analysis/
 data/
 result/
 save_model/
 save_weight/
+metric_plots/
