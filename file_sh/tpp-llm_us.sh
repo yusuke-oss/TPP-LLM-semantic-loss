@@ -28,7 +28,7 @@ BASE_WEIGHT_SAVE_PATHS=(
 )
 
 # 損失関数の係数設定 (Concept/Directional Loss)
-ALPHA_CONCEPTS=(10000.0)
+BETA_SEMANTICS=(10000.0)
 
 # =========================================================
 #   実行ループ
@@ -44,7 +44,7 @@ for seed in "${SEEDS[@]}"; do
     
     # 変数セットアップ
     DATASET_PATH="${BASE_DATASET_PATHS[$i]}"
-    CUR_ALPHA_C="${ALPHA_CONCEPTS[$i]}"
+    CUR_BETA_S="${BETA_SEMANTICS[$i]}"
     
     # パス生成 (すべてシードごとにディレクトリを分ける)
     CUR_RESULT="${BASE_RESULT_PATHS[$i]}/seed_${seed}"
@@ -57,7 +57,7 @@ for seed in "${SEEDS[@]}"; do
     echo "-------------------------------------------------------"
     echo " Running Experiment Index: $i (Seed: $seed)"
     echo " Dataset: $DATASET_PATH"
-    echo " Alpha Concept: $CUR_ALPHA_C"
+    echo " Beta Semantic: $CUR_BETA_S"
     echo "-------------------------------------------------------"
 
     # メイン学習スクリプトの実行
@@ -69,7 +69,7 @@ for seed in "${SEEDS[@]}"; do
       --model_weight_path="${CUR_MODEL_LOAD}" \
       --weight_path="${CUR_WEIGHT}" \
       --seed="${seed}" \
-      --alpha_concept="${CUR_ALPHA_C}"
+      --beta_semantic="${CUR_BETA_S}"
 
     echo ">>> Experiment $i (Seed: $seed) Completed."
     echo ""

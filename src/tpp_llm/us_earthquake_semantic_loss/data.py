@@ -28,11 +28,6 @@ def collate_fn(batch: dict) -> dict:
     dep_dist: frozen distribution object for depth
     """
     
-    
-    
-
-    
-
     return {
         'time_since_start': [torch.FloatTensor(item['time_since_start']) for item in batch],
         'time_since_last_event': [torch.FloatTensor(item['time_since_last_event']) for item in batch],
@@ -61,16 +56,11 @@ def create_few_shot_dataset(data_dir, output_dir, few_shot_ratio=0.1, seed=0) ->
     print(f"Few-shot dataset created in {output_dir}.")
 
 
-def get_all_data_stats(dataset_dir: str) -> dict:
+def get_all_data_stats(dataset_dir):
     """
-    Calculate global statistics (min/max) for magnitude, depth, time, and delta
-    from all JSON files (train, dev, test) in the specified dataset directory.
-
-    Args:
-        dataset_dir (str): Path to the directory containing the dataset JSON files.
-
-    Returns:
-        dict: A dictionary containing the min and max values for 'mag', 'dep', 'time', and 'delta'.
+    Train/Val/Test すべてのファイルを読み込んで、データセット全体の
+    「最大値」と「最小値」を計算する関数。
+    マグニチュード、深さ、時刻に加えて「時間差 (Delta)」も計算。
     """
     print(f"Calculating global stats (min/max) from all files in {dataset_dir}...")
 
@@ -118,13 +108,12 @@ def get_all_data_stats(dataset_dir: str) -> dict:
         except Exception as e:
             print(f"Error reading {fname}: {e}")
 
-    # Fallback to default values if data is completely empty
     if stats['mag']['max'] == float('-inf'): stats['mag'] = {'min': -2.0, 'max': 10.0}
     if stats['dep']['max'] == float('-inf'): stats['dep'] = {'min': 0.0, 'max': 700.0}
     if stats['time']['max'] == float('-inf'): stats['time'] = {'min': 0.0, 'max': 100.0}
     if stats['delta']['max'] == float('-inf'): stats['delta'] = {'min': 0.0, 'max': 100.0}
 
-    print("Global Stats Result:")
+    print(f"Global Stats Result:")
     print(f"  > Magnitude: {stats['mag']['min']} ~ {stats['mag']['max']}")
     print(f"  > Depth:     {stats['dep']['min']} ~ {stats['dep']['max']}")
     print(f"  > Time:      {stats['time']['min']} ~ {stats['time']['max']}")
