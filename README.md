@@ -118,16 +118,3 @@ We appreciate the open-source community, especially the developers of [Hugging F
 ## Contact
 
 If you have any questions or concerns, please submit an issue on GitHub.
-
-## Citation
-
-If you find this repo useful in your research, please consider citing our paper as follows:
-
-```bibtex
-@inproceedings{yourname2026tppllm,
-  title={大規模言語モデル駆動型点過程解析における数値データの言語空間への埋め込み手法の検討},
-  author={[あなたの名前] and [共著者の名前]},
-  booktitle={[発表する学会名、例えば: 第XX回人工知能学会全国大会 (JSAI 2026)]},
-  year={2026}
-}
-```
