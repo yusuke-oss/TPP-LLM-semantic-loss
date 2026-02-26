@@ -2,7 +2,7 @@
 **TPP-LLM: A Study on Embedding Numerical Data into Language Space in LLM-Driven Point Process Analysis**
 *(大規模言語モデル駆動型点過程解析における数値データの言語空間への埋め込み手法の検討)*
 
-Official PyTorch implementation of TPP-LLM with MLP embedding method and semantic alignment loss.
+Official PyTorch implementation of TPP-LLM with MLP embedding method and semantic loss.
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
@@ -45,7 +45,7 @@ To run the experiments with tuned hyperparameters, follow these steps:
 
 1. **Clone the repository**:
    ```bash
-   git clone [https://github.com/](https://github.com/)[あなたのユーザー名]/TPP-LLM-semantic-loss.git
+   git clone https://github.com/yusuke-oss/TPP-LLM-semantic-loss.git
    cd TPP-LLM-semantic-loss
    ```
 
@@ -85,7 +85,6 @@ The repository is organized as follows:
 ```plaintext
 .
 ├── README.md
-├── CITATION.cff
 ├── requirements.txt
 ├── train_tpp_llm.py             # Main script to run the model training and evaluation
 ├── data/
