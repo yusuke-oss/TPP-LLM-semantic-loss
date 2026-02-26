@@ -14,7 +14,6 @@ from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
 from src.tpp_llm.us_earthquake_semantic_loss.model import TPPLLMModel
-from src.tpp_llm.us_earthquake_semantic_loss.analysis import run_full_evaluation
 
 class TPPLLMRunner(object):
     """
@@ -345,17 +344,8 @@ class TPPLLMRunner(object):
             (all_types_true, all_types_pred, all_times_true, all_time_preds, all_time_deltas_true, seq_scores_val) = eval_data
             quantitative_analysis_func(
                 all_types_true, all_types_pred, all_times_true, all_time_preds, all_time_deltas_true,
-                result_save_path, "initial_val", seq_scores_val
+                result_save_path, "initial_val","initial", seq_scores_val
             )
-            
-            save_target_dir = result_save_path
-            if hasattr(self.model, 'tokenizer'):
-                run_full_evaluation(model=self.model, 
-                    tokenizer=self.model.tokenizer, 
-                    save_dir=save_target_dir, 
-                    epoch="initial", 
-                    device=self.device
-                )
             
         # ---------------------------------------------------------
         # Initial Test
@@ -369,7 +359,7 @@ class TPPLLMRunner(object):
             (all_types_true_test, all_types_pred_test, all_times_true_test, all_time_preds_test, all_time_deltas_true_test, seq_scores_test) = test_eval_data
             quantitative_analysis_func(
                 all_types_true_test, all_types_pred_test, all_times_true_test, all_time_preds_test, all_time_deltas_true_test,
-                result_save_path, "initial_test", seq_scores_test
+                result_save_path, "initial_test","initial", seq_scores_test
             )
             with open(os.path.join(result_save_path, "seq_scores_initial_test.json"), "w") as f:
                 json.dump(seq_scores_test, f)
@@ -410,22 +400,10 @@ class TPPLLMRunner(object):
                         if save_flag:
                             self.save(model_weight_path, weight_path)
 
-                            save_target_dir = result_save_path
-
-                            if hasattr(self.model, 'tokenizer'):
-                                run_full_evaluation(
-                                    model=self.model, 
-                                    tokenizer=self.model.tokenizer, 
-                                    save_dir=save_target_dir, 
-                                    epoch=epoch, 
-                                    device=self.device
-                                )
-                        
-
                         (all_types_true, all_types_pred, all_times_true, all_time_preds, all_time_deltas_true, seq_scores_val) = eval_data
                         quantitative_analysis_func(
                             all_types_true, all_types_pred, all_times_true, all_time_preds, all_time_deltas_true,
-                            result_save_path, "val", seq_scores_val
+                            result_save_path, "val", epoch, seq_scores_val
                         )
                     else:
                         epochs_no_improve += 1
@@ -447,7 +425,7 @@ class TPPLLMRunner(object):
                     (all_types_true_test, all_types_pred_test, all_times_true_test, all_time_preds_test, all_time_deltas_true_test, seq_scores_test) = test_eval_data
                     quantitative_analysis_func(
                         all_types_true_test, all_types_pred_test, all_times_true_test, all_time_preds_test, all_time_deltas_true_test,
-                        result_save_path, f"test", seq_scores_test
+                        result_save_path, f"test", epoch, seq_scores_test
                     )
                     with open(os.path.join(result_save_path, "seq_scores_best_test.json"), "w") as f:
                         json.dump(seq_scores_test, f)
