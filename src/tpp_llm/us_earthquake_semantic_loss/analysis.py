@@ -7,13 +7,13 @@ import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import confusion_matrix,classification_report, balanced_accuracy_score
+from sklearn.metrics import confusion_matrix, classification_report, balanced_accuracy_score
 
 # ====================================================================
 # 1. Qualitative & Quantitative Sequence Evaluation
 # ====================================================================
 
-def visualize_qualitative_sequence(raw_data, save_dir,phase_name, epoch, num_examples=5):
+def visualize_qualitative_sequence(raw_data, save_dir, phase_name, epoch, num_examples=5):
     """
     Generate trajectory plots for qualitative evaluation.
     Top: True vs Predicted Event Type (Discrete)
@@ -27,7 +27,7 @@ def visualize_qualitative_sequence(raw_data, save_dir,phase_name, epoch, num_exa
     type_to_y = {0: 2, 1: 1, 2: 0} 
     y_labels = {0: "Small", 1: "Medium", 2: "Large"}
 
-    # ★変更: "plots_sequence" フォルダにスッキリまとめる
+    # Organize neatly into the "plots_sequence" directory
     vis_dir = os.path.join(save_dir, f"analysis/plots_sequence/{phase_name}")
     os.makedirs(vis_dir, exist_ok=True)
 
@@ -106,41 +106,28 @@ def perform_quantitative_analysis(
     all_times_true, all_time_preds,
     all_time_deltas_true,
     result_save_path, phase_name,
-    epoch, # ★追加: エポック数を受け取る
+    epoch, # Passed from the runner
     seq_scores=None
 ):
     """
     Evaluate quantitative metrics (Confusion Matrix, RMSE, Classification Report).
-    Results are saved neatly in the 'metrics' directory by epoch.
+    Results are saved neatly in the detailed analysis directory by epoch.
     """
     print(f"--- Running Quantitative Analysis ({phase_name} - Epoch {epoch}) ---")
     
-    # ★変更: metrics の中に epoch ごとのフォルダを作る
-    quant_dir = os.path.join(result_save_path, "analysis",f"detail/epoch_{epoch}/{phase_name}")
+    # Create an epoch-specific directory within the detailed metrics folder
+    quant_dir = os.path.join(result_save_path, "analysis", f"detail/epoch_{epoch}/{phase_name}")
     os.makedirs(quant_dir, exist_ok=True)
 
     # 1. Confusion Matrix
     try:
         class_names = ['Large', 'Medium', 'Small'] 
         cm = confusion_matrix(all_types_true, all_types_pred, labels=[0, 1, 2], normalize='true')
-        sns.reset_orig()  # Seabornの設定を初期化
+        sns.reset_orig()  # Reset seaborn settings to prevent layout issues
         import matplotlib as mpl
         mpl.rcParams.update({'font.size': 12, 'axes.titlesize': 14, 'axes.labelsize': 12})
         
-        # --- タイトルあり版 (Titled) ---
-        fig, ax = plt.subplots(figsize=(6, 5))
-        sns.heatmap(cm, annot=True, fmt=".2f", cmap="Blues", ax=ax,
-                    xticklabels=class_names, yticklabels=class_names,
-                    vmin=0.0, vmax=1.0, square=True, cbar_kws={"shrink": .8})
-        ax.set_ylabel('True label', fontweight='bold')
-        ax.set_xlabel('Predicted label', fontweight='bold')
-        ax.set_title(f'Normalized Confusion Matrix ({phase_name})', pad=15, fontweight='bold') 
-        
-        plt.savefig(os.path.join(quant_dir, f'confusion_matrix_titled.png'), 
-                    bbox_inches='tight', dpi=150)
-        plt.close(fig)
-
-        # --- タイトルなし版 (Untitled) ---
+        # --- Clean Version (Untitled for Academic Papers) ---
         fig, ax = plt.subplots(figsize=(6, 5))
         sns.heatmap(cm, annot=True, fmt=".2f", cmap="Blues", ax=ax,
                     xticklabels=class_names, yticklabels=class_names,
@@ -148,7 +135,8 @@ def perform_quantitative_analysis(
         ax.set_ylabel('True label', fontweight='bold')
         ax.set_xlabel('Predicted label', fontweight='bold')
         
-        plt.savefig(os.path.join(quant_dir, f'confusion_matrix_untitled.png'), 
+        # Save with a simple filename
+        plt.savefig(os.path.join(quant_dir, f'confusion_matrix.png'), 
                     bbox_inches='tight', dpi=150)
         plt.close(fig)
         
@@ -196,14 +184,14 @@ def perform_quantitative_analysis(
         
         with open(os.path.join(quant_dir, f'analysis_report.txt'), 'w') as f:
             f.write(combined_log)
-        #with open(os.path.join(result_save_path, 'val.txt'), 'a') as f:
-        #    f.write(f"\n[{phase_name} Phase - Epoch {epoch}]\n" + combined_log)
+        # Uncomment below if you want to append to the global val.txt log
+        # with open(os.path.join(result_save_path, 'val.txt'), 'a') as f:
+        #     f.write(f"\n[{phase_name} Phase - Epoch {epoch}]\n" + combined_log)
             
     except Exception as e:
         print(f"Failed to save analysis logs: {e}")
 
     # 5. Call Sequence Qualitative Analysis
     if seq_scores and 'raw_data' in seq_scores:
-        # result_save_path を渡すことで、seedの直下に plots_sequence が作られます
-        visualize_qualitative_sequence(seq_scores['raw_data'], result_save_path,phase_name, epoch, num_examples=30)
-
+        # Pass result_save_path to construct the plots_sequence directory cleanly
+        visualize_qualitative_sequence(seq_scores['raw_data'], result_save_path, phase_name, epoch, num_examples=30)
