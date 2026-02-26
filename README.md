@@ -39,25 +39,30 @@ The following visualizations illustrate the effectiveness of our semantic loss. 
 ![Visualization 1]([ここに分析コードで出力した2D_Magnitude_Untitled.pngなどのURLを貼ります])
 ![Visualization 2]([ここに分析コードで出力したqualitative_plotsなどのURLを貼ります])
 
-## Running the Experiments
 
-To run the experiments with tuned hyperparameters, follow these steps:
+## Installation
 
-1. **Clone the repository**:
+1. Clone the repository:
    ```bash
-   git clone https://github.com/yusuke-oss/TPP-LLM-semantic-loss.git
-   cd TPP-LLM-semantic-loss
+   git clone https://github.com/zefang-liu/TPP-LLM
+   cd TPP-LLM
    ```
 
-2. **Install the required dependencies**:
+2. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Data Preparation**:
+3. Add the source code to your Python path:
+   ```bash
+   export PYTHONPATH=$PYTHONPATH:<path-to-your-folder>/src
+   ```
+
+
+4. **Data Preparation**:
    Place your preprocessed datasets (`train.json`, `dev.json`, `test.json`) in the `./data/us_earthquake` directory.
 
-4. **Run the experiments**:
+5. **Run the experiments**:
    Execute the training script with the specified parameters:
    ```bash
    python train_tpp_llm.py \
@@ -77,6 +82,14 @@ To run the experiments with tuned hyperparameters, follow these steps:
    ```bash
    bash tpp-llm_us.sh
    ```
+
+## Datasets
+
+The cleaned data used in this project can be downloaded from [Hugging Face](https://huggingface.co/datasets/yyyxz12047/Earthquake-Dataset-add-magnitude-and-depth). Or you can download and preprocess raw data by running the notebook [`notebooks/tpp_data.ipynb`](notebooks/tpp_data.ipynb). Supported datasets include:
+
+- U.S. Earthquake
+
+Processed datasets will be stored in the `data/` directory.
 
 ## File Structure
 
