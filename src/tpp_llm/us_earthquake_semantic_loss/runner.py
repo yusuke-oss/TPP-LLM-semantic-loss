@@ -361,9 +361,7 @@ class TPPLLMRunner(object):
                 all_types_true_test, all_types_pred_test, all_times_true_test, all_time_preds_test, all_time_deltas_true_test,
                 result_save_path, "initial_test","initial", seq_scores_test
             )
-            with open(os.path.join(result_save_path, "seq_scores_initial_test.json"), "w") as f:
-                json.dump(seq_scores_test, f)
-
+        
         patience = 10
         epochs_no_improve = 0
 

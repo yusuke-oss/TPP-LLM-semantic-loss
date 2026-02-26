@@ -6,12 +6,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
-import matplotlib.patheffects as patheffects
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report, balanced_accuracy_score
-from sklearn.decomposition import PCA
-from scipy.spatial.distance import pdist
-from scipy.stats import spearmanr, pearsonr, shapiro, norm
+from sklearn.metrics import confusion_matrix,classification_report, balanced_accuracy_score
 
 # ====================================================================
 # 1. Qualitative & Quantitative Sequence Evaluation
@@ -32,7 +28,7 @@ def visualize_qualitative_sequence(raw_data, save_dir,phase_name, epoch, num_exa
     y_labels = {0: "Small", 1: "Medium", 2: "Large"}
 
     # ★変更: "plots_sequence" フォルダにスッキリまとめる
-    vis_dir = os.path.join(save_dir, f"plots_sequence/{phase_name}")
+    vis_dir = os.path.join(save_dir, f"analysis/plots_sequence/{phase_name}")
     os.makedirs(vis_dir, exist_ok=True)
 
     for i, seq in enumerate(selected_seqs):
@@ -120,7 +116,7 @@ def perform_quantitative_analysis(
     print(f"--- Running Quantitative Analysis ({phase_name} - Epoch {epoch}) ---")
     
     # ★変更: metrics の中に epoch ごとのフォルダを作る
-    quant_dir = os.path.join(result_save_path, "analysis",f"epoch_{epoch}/{phase_name}")
+    quant_dir = os.path.join(result_save_path, "analysis",f"detail/epoch_{epoch}/{phase_name}")
     os.makedirs(quant_dir, exist_ok=True)
 
     # 1. Confusion Matrix
