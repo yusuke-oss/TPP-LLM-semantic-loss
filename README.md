@@ -47,22 +47,25 @@ The following visualizations illustrate the effectiveness of our semantic loss. 
    git clone https://github.com/zefang-liu/TPP-LLM
    cd TPP-LLM
    ```
-
-2. Install the required dependencies:
+2.  
+   ```bash
+   conda create -n <env name> python=3.13.2
+   ```
+3. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Add the source code to your Python path:
+4. Add the source code to your Python path:
    ```bash
    export PYTHONPATH=$PYTHONPATH:<path-to-your-folder>/src
    ```
 
 
-4. **Data Preparation**:
+5. **Data Preparation**:
    Place your preprocessed datasets (`train.json`, `dev.json`, `test.json`) in the `./data/us_earthquake` directory.
 
-5. **Run the experiments**:
+6. **Run the experiments**:
    Execute the training script with the specified parameters:
    ```bash
    python train_tpp_llm.py \
