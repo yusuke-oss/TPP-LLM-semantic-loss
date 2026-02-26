@@ -77,6 +77,9 @@ To run the experiments with tuned hyperparameters, follow these steps:
        --save_flag \
        --train_flag
    ```
+   ```bash
+   bash tpp-llm_us.sh
+   ```
 
 ## File Structure
 
