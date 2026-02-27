@@ -169,11 +169,14 @@ This will generate a summary text file (e.g., `beta_10000.0_summary.txt`) in you
 If you find this code or the original TPP-LLM framework useful in your research, please cite the foundational [paper](https://arxiv.org/abs/2410.02062):
 
 ```bibtex
-@article{liu2024tppllmm,
-  title={TPP-LLM: Modeling Temporal Point Processes by Efficiently Fine-Tuning Large Language Models},
-  author={Liu, Zefang and Quan, Yinzhu},
-  journal={arXiv preprint arXiv:2410.02062},
-  year={2024}
+@misc{liu2025tppllmmodelingtemporalpoint,
+      title={TPP-LLM: Modeling Temporal Point Processes by Efficiently Fine-Tuning Large Language Models}, 
+      author={Zefang Liu and Yinzhu Quan},
+      year={2025},
+      eprint={2410.02062},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2410.02062}, 
 }
 ```
 
