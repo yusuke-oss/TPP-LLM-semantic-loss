@@ -24,8 +24,8 @@ Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062)
 
 For easy reproducibility and immediate evaluation, we provide the fully processed dataset and our trained model weights (trained with `seed=42`) on Hugging Face:
 
-- **📊 Dataset (U.S. Earthquake)**: [Download from Hugging Face](https://huggingface.co/datasets/your-username/us_earthquake)
-- **🧠 Model Weights (TPP-LLM Semantic Loss)**: [Download from Hugging Face](https://huggingface.co/your-username/tpp-llm-us-earthquake)
+- **📊 Dataset (U.S. Earthquake)**: [Download from Hugging Face](https://huggingface.co/datasets/yyyxz12047/TPP-LLM-semantic-loss)
+- **🧠 Model Weights (TPP-LLM Semantic Loss)**: [Download from Hugging Face](https://huggingface.co/yyyxz12047/TPP-LLM-semantic-loss/tree/main)
 
 *You can download the dataset and place it directly into the `data/us_earthquake/` directory to skip the preprocessing step. Similarly, downloading the model weights allows you to run evaluations immediately without training from scratch.*
 
