@@ -206,7 +206,7 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-analysis/
+analysis/coefficient.py
 data/
 result/
 save_model/

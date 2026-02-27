@@ -43,6 +43,8 @@ For easy reproducibility and immediate evaluation, we provide the fully processe
 │   └── tpp-llm_semantic_loss.png # Architecture diagrams
 ├── notebooks/
 │   └── tpp_data.ipynb           # Data download and preprocessing pipeline (USGS API)
+├── save_model/                  # ⚠️ Generated locally: Saved LoRA adapters (Ignored by Git)
+├── save_weight/                 # ⚠️ Generated locally: Merged model weights (Ignored by Git)
 ├── scripts/
 │   └── us_earthquake_semantic_loss/
 │       └── train_tpp_llm.py     # Main entry point for training
@@ -56,7 +58,8 @@ For easy reproducibility and immediate evaluation, we provide the fully processe
 │       ├── common_utils.py      # Reproducibility (Seed) utilities
 │       └── analysis.py          # Visualization and quantitative metric tools
 ├── tpp-llm_us.sh                # Execution script (runs multiple seeds & betas automatically)
-└── requirements.txt             # Strict version dependencies for reproducibility
+├── requirements.txt             # Strict version dependencies for reproducibility
+└── .gitignore                   # Keeps heavy model weights and caches out of the repository
 ```
 
 ## 🛠️ Installation
@@ -104,11 +107,11 @@ This project utilizes the U.S. Earthquake dataset (2020-2024). We provide a comp
 The behavior of the training script (`train_tpp_llm.py`) is controlled by three main flags. You can mix and match them depending on your goal:
 
 * `--train_flag`: Executes the training loop across all epochs.
-* `--save_flag`: Saves the model weights (LoRA adapter + newly added tokens) to the `model_weight_path` whenever a new best validation score is achieved.
+* `--save_flag`: Saves the model weights (LoRA adapter + newly added tokens) to the `model_weight_path` whenever a new best validation score is achieved. *(Note: Saved weights are ignored by Git via `.gitignore` to prevent uploading large files).*
 * `--load_flag`: Loads pre-trained model weights from the `model_weight_path` before execution.
 
 ### Case 1: Training from Scratch
-To train the model from scratch and save the best weights, execute the provided bash script. (Ensure `--train_flag` and `--save_flag` are passed in `tpp-llm_us.sh` or `configs/tpp_llm_ue.config`).
+To train the model from scratch and save the best weights locally, execute the provided bash script. (Ensure `--train_flag` and `--save_flag` are passed in `tpp-llm_us.sh` or `configs/tpp_llm_ue.config`).
 
 ```bash
 bash tpp-llm_us.sh
