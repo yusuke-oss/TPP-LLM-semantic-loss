@@ -68,7 +68,7 @@ To ensure full reproducibility of the results reported in this project, please i
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/your-username/TPP-LLM.git](https://github.com/your-username/TPP-LLM.git)
+   git clone https://github.com/yusuke-oss/TPP-LLM-semantic-loss.git
    cd TPP-LLM
    ```
 
