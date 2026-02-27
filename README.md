@@ -103,8 +103,6 @@ This project utilizes the U.S. Earthquake dataset (2020-2024). We provide a comp
 
 ## 🚀 Usage
 
-The behavior of the training script is controlled by execution flags (`--train_flag`, `--save_flag`, `--load_flag`).
-
 ### ⚙️ Configuring the Execution Script (`tpp-llm_us.sh`)
 We provide a bash script to automate training and evaluation across multiple configurations. Before running the script, open `tpp-llm_us.sh` to configure the random seeds and loss coefficients you want to test:
 
@@ -117,10 +115,19 @@ BETA_SEMANTICS=(10000.0)
 ```
 The script automatically builds the hierarchical directory structure (`.../beta_10000.0/seed_42/`) and executes the Python script for each combination.
 
-### Case 1: Training from Scratch
+### 🎯 Execution Modes (Choose One)
+The behavior of the training script is controlled by **mutually exclusive** execution flags. You must select exactly one mode at the bottom of your configuration file (`configs/tpp_llm_ue.config`):
+
+* `--save_flag`: Trains the model from scratch, evaluates it, and saves the best weights locally.
+* `--train_flag`: Trains and evaluates the model, but does *not* save the weights (useful for debugging).
+* `--load_flag`: Skips training, loads pre-trained weights from `model_weight_path`, and runs evaluation directly.
+
+---
+
+### Case 1: Training from Scratch and Saving
 To train the model from scratch and save the best weights locally:
 
-1. Open `configs/tpp_llm_ue.config` and ensure `--save_flag` and `--train_flag` are present.
+1. Open `configs/tpp_llm_ue.config` and ensure **only** `--save_flag` is present at the bottom.
 2. Run the provided bash script:
    ```bash
    bash tpp-llm_us.sh
@@ -134,21 +141,16 @@ If you downloaded our pre-trained weights from Hugging Face, you can evaluate th
    *(Ensure your dataset is also placed in `data/us_earthquake/`)*
 
 2. **Update the config file** (`configs/tpp_llm_ue.config`):
-   Comment out or remove `--save_flag` and `--train_flag` so the model doesn't start a new training loop.
+   Replace `--save_flag` with `--load_flag` so the model skips the training loop and loads the weights.
 
-3. **Modify the execution script** (`tpp-llm_us.sh`):
-   Open `tpp-llm_us.sh` in a text editor. Scroll to the bottom and add `--load_flag \` to the arguments of the `python` command, like this:
    ```text
-   # --- Inside tpp-llm_us.sh ---
-   python "scripts/us_earthquake_semantic_loss/train_tpp_llm.py" \
-     @configs/tpp_llm_ue.config \
-     ...
-     --seed="${seed}" \
-     --beta_semantic="${CUR_BETA_S}" \
-     --load_flag  # <--- ADD THIS LINE
+   # --- Bottom of configs/tpp_llm_ue.config ---
+   --seed=42
+   --model_weight_path=save_model/us_earthquake_semantic_loss
+   --load_flag    # <--- USE ONLY THIS FLAG
    ```
 
-4. **Execute the script** from your terminal:
+3. **Run the script**:
    ```bash
    bash tpp-llm_us.sh
    ```
