@@ -85,7 +85,7 @@ To ensure full reproducibility of the results reported in this project, please i
 
 4. Add the source code to your Python path:
    ```bash
-   export PYTHONPATH=$PYTHONPATH:<path-to-your-folder>/src
+   export PYTHONPATH=$PYTHONPATH:src
    ```
 
 ## 📊 Dataset Preparation (U.S. Earthquake)
