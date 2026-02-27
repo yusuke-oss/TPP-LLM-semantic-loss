@@ -1,4 +1,4 @@
-# TPP-LLM: Modeling Temporal Point Processes with Semantic Alignment for Continuous Data
+# A Study on Methods for Embedding Numerical Data into Language Space in LLM-Driven Point Process Analysis
 
 This repository provides an extended implementation of **TPP-LLM**, a framework that integrates Temporal Point Processes (TPPs) with Large Language Models (LLMs) for event sequence prediction. 
 
@@ -120,8 +120,7 @@ The behavior of the training script is controlled by **mutually exclusive** exec
 
 * `--save_flag`: Trains the model from scratch, evaluates it, and saves the best weights locally.
 * `--train_flag`: Trains and evaluates the model, but does *not* save the weights (useful for debugging).
-* `--load_flag`: Skips training, loads pre-trained weights from `model_weight_path`, and runs evaluation directly.
-
+* `--load_flag`: Skips training, loads pre-trained weights from your local paths, and runs evaluation directly.
 ---
 
 ### Case 1: Training from Scratch and Saving
@@ -136,8 +135,9 @@ To train the model from scratch and save the best weights locally:
 ### Case 2: Evaluating a Pre-trained Model
 If you downloaded our pre-trained weights from Hugging Face, you can evaluate them directly on the test set without training.
 
-1. **Place the downloaded weights** into the corresponding local directory. For example, for `seed=42` and `beta_semantic=10000.0`, extract the files into:
-   `save_model/us_earthquake_semantic_loss/beta_10000.0/seed_42/`
+1. **Place the downloaded weights** into their corresponding local directories. For example, for `seed=42` and `beta_semantic=10000.0`, ensure the files are extracted like this:
+   * `save_model/us_earthquake_semantic_loss/beta_10000.0/seed_42/` *(Contains LoRA & Tokenizer)*
+   * `save_weight/us_earthquake_semantic_loss/beta_10000.0/seed_42/` *(Contains TPP Prediction Heads)*
    *(Ensure your dataset is also placed in `data/us_earthquake/`)*
 
 2. **Update the config file** (`configs/tpp_llm_ue.config`):
@@ -147,6 +147,7 @@ If you downloaded our pre-trained weights from Hugging Face, you can evaluate th
    # --- Bottom of configs/tpp_llm_ue.config ---
    --seed=42
    --model_weight_path=save_model/us_earthquake_semantic_loss
+   --weight_path=save_weight/us_earthquake_semantic_loss
    --load_flag    # <--- USE ONLY THIS FLAG
    ```
 
