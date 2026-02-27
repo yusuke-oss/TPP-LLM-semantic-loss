@@ -66,7 +66,9 @@ def visualize_qualitative_sequence(raw_data, save_dir, phase_name, epoch, num_ex
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), sharex=False)
         plt.subplots_adjust(right=0.85, hspace=0.15)
 
+        # ==========================================
         # Upper plot: Event Types
+        # ==========================================
         ax1.grid(True, axis='y', linestyle='--', alpha=0.7)
         ax1.grid(True, axis='x', linestyle=':', alpha=0.5)
 
@@ -79,18 +81,25 @@ def visualize_qualitative_sequence(raw_data, save_dir, phase_name, epoch, num_ex
         ax1.set_yticks(yticks_vals)
         ax1.set_yticklabels([y_labels[v] for v in yticks_vals])
         ax1.set_ylim(-0.5, 2.5)
+        
+        ax1.legend(loc='upper left', bbox_to_anchor=(1.02, 1.0), frameon=True, fontsize=12)
 
         props = dict(boxstyle='round', facecolor='white', alpha=1.0, edgecolor='gray')
         ax1.text(1.02, 0.0, acc_str, transform=ax1.transAxes, fontsize=12, 
                  verticalalignment='bottom', bbox=props)
 
+        # ==========================================
         # Lower plot: Absolute Times
+        # ==========================================
         ax2.grid(True, linestyle='--', alpha=0.7)
         ax2.plot(steps, true_times, color='black', marker='s', markersize=6,
                  linestyle='-', label='True Time', alpha=0.6)
         ax2.plot(steps, pred_times, color='green', marker='^', markersize=6,
                  linestyle='--', label='Predicted Time', alpha=0.8)
         ax2.set_ylim(bottom=0) 
+        
+        # ★ 修正: 凡例（Legend）を追加 ★
+        ax2.legend(loc='upper left', bbox_to_anchor=(1.02, 1.0), frameon=True, fontsize=12)
 
         ax2.text(1.02, 0.0, rmse_str, transform=ax2.transAxes, fontsize=12, 
                  verticalalignment='bottom', bbox=props)
@@ -184,14 +193,10 @@ def perform_quantitative_analysis(
         
         with open(os.path.join(quant_dir, f'analysis_report.txt'), 'w') as f:
             f.write(combined_log)
-        # Uncomment below if you want to append to the global val.txt log
-        # with open(os.path.join(result_save_path, 'val.txt'), 'a') as f:
-        #     f.write(f"\n[{phase_name} Phase - Epoch {epoch}]\n" + combined_log)
             
     except Exception as e:
         print(f"Failed to save analysis logs: {e}")
 
     # 5. Call Sequence Qualitative Analysis
     if seq_scores and 'raw_data' in seq_scores:
-        # Pass result_save_path to construct the plots_sequence directory cleanly
         visualize_qualitative_sequence(seq_scores['raw_data'], result_save_path, phase_name, epoch, num_examples=30)

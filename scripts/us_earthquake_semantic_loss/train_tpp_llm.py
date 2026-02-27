@@ -40,7 +40,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--num_event_types', type=int, required=True, help='number of event types')
     parser.add_argument(
-        '--temporal_emb_type', type=str, default='positional', choices=['linear', 'positional', 'shifted','MLP'],
+        '--temporal_emb_type', type=str, default='positional', choices=['positional','MLP'],
         help='temporal embedding type')
     parser.add_argument(
         '--temporal_emb_first', action='store_true', help='temporal embedding first or not')
