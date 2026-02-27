@@ -74,7 +74,7 @@ To ensure full reproducibility of the results reported in this project, please i
 
 2. We highly recommend using a virtual environment (e.g., Conda):
    ```bash
-   conda create -n tpp-llm python=3.10 -y
+   conda create -n tpp-llm python=3.13.2
    conda activate tpp-llm
    ```
 
