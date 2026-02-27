@@ -100,17 +100,32 @@ This project utilizes the U.S. Earthquake dataset (2020-2024). We provide a comp
 
 ## 🚀 Usage
 
-### Running Experiments
-To train and evaluate the model using the US Earthquake dataset across multiple random seeds, simply execute the provided bash script. This script automatically handles directory creation and iterates over the defined seeds.
+### ⚙️ Core Execution Flags
+The behavior of the training script (`train_tpp_llm.py`) is controlled by three main flags. You can mix and match them depending on your goal:
+
+* `--train_flag`: Executes the training loop across all epochs.
+* `--save_flag`: Saves the model weights (LoRA adapter + newly added tokens) to the `model_weight_path` whenever a new best validation score is achieved.
+* `--load_flag`: Loads pre-trained model weights from the `model_weight_path` before execution.
+
+### Case 1: Training from Scratch
+To train the model from scratch and save the best weights, execute the provided bash script. (Ensure `--train_flag` and `--save_flag` are passed in `tpp-llm_us.sh` or `configs/tpp_llm_ue.config`).
 
 ```bash
 bash tpp-llm_us.sh
 ```
 
-You can adjust the configuration (e.g., learning rate, LoRA rank, batch size) by editing `configs/tpp_llm_ue.config` or modifying the arguments in the shell script.
+### Case 2: Evaluating a Pre-trained Model
+If you downloaded our pre-trained weights from Hugging Face, you can run an evaluation directly on the test set without training. Pass **only** the `--load_flag`:
 
-### Aggregating Results
-After running the experiments across multiple seeds, you can automatically extract the best epoch from the validation logs and aggregate the final test metrics (Mean ± StdDev) by running:
+```bash
+python scripts/us_earthquake_semantic_loss/train_tpp_llm.py \
+  @configs/tpp_llm_ue.config \
+  --model_weight_path="path/to/downloaded/weights" \
+  --load_flag
+```
+
+### 📈 Aggregating Results
+After running experiments across multiple seeds, you can automatically extract the best epoch from the validation logs and aggregate the final test metrics (Mean ± StdDev) by running:
 
 ```bash
 python analysis/process_results.py
