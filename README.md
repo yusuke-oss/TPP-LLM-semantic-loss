@@ -20,6 +20,15 @@ Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062)
   - 2D Semantic Space Visualizations (PCA) to verify the distance preservation of learned numerical embeddings.
   - Automated metric extraction and aggregation across multiple experimental seeds.
 
+## 🤗 Pre-trained Models & Datasets
+
+For easy reproducibility and immediate evaluation, we provide the fully processed dataset and our trained model weights (trained with `seed=42`) on Hugging Face:
+
+- **📊 Dataset (U.S. Earthquake)**: [Download from Hugging Face](https://huggingface.co/datasets/your-username/us_earthquake)
+- **🧠 Model Weights (TPP-LLM Semantic Loss)**: [Download from Hugging Face](https://huggingface.co/your-username/tpp-llm-us-earthquake)
+
+*You can download the dataset and place it directly into the `data/us_earthquake/` directory to skip the preprocessing step. Similarly, downloading the model weights allows you to run evaluations immediately without training from scratch.*
+
 ## 📂 Directory Structure
 
 ```text
@@ -29,9 +38,11 @@ Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062)
 ├── configs/
 │   └── tpp_llm_ue.config        # Configuration file for US Earthquake experiments
 ├── data/
-│   └── us_earthquake/           # Directory for dataset files (train.json, dev.json, test.json)
+│   └── us_earthquake/           # Processed datasets (train.json, dev.json, test.json)
 ├── images/
 │   └── tpp-llm_semantic_loss.png # Architecture diagrams
+├── notebooks/
+│   └── tpp_data.ipynb           # Data download and preprocessing pipeline (USGS API)
 ├── scripts/
 │   └── us_earthquake_semantic_loss/
 │       └── train_tpp_llm.py     # Main entry point for training
@@ -74,6 +85,19 @@ To ensure full reproducibility of the results reported in this project, please i
    export PYTHONPATH=$PYTHONPATH:$(pwd)
    ```
 
+## 📊 Dataset Preparation (U.S. Earthquake)
+
+This project utilizes the U.S. Earthquake dataset (2020-2024). We provide a complete Jupyter Notebook to download and preprocess the raw data from the USGS API automatically.
+
+1. Open `notebooks/tpp_data.ipynb` in Jupyter or VS Code.
+2. Run all cells. The notebook will:
+   - Download raw CSV data via the USGS Earthquake API.
+   - Filter and group earthquakes into discrete sequences based on location and time.
+   - Extract continuous values (`magnitude`, `depth`, `time_since_start`).
+   - Split the data into 80/10/10 and generate `train.json`, `dev.json`, and `test.json` in the `data/us_earthquake/` directory.
+
+*(Note: The `data.py` loader will automatically calculate the min/max statistics across these JSON files to dynamically normalize inputs for the MLP encoders).*
+
 ## 🚀 Usage
 
 ### Running Experiments
@@ -93,12 +117,6 @@ python analysis/process_results.py
 ```
 
 This will generate a summary text file (e.g., `beta_10000.0_summary.txt`) in your results directory containing the compiled statistics.
-
-## 📊 Datasets
-
-This project includes configurations tailored for the **U.S. Earthquake** dataset. The dataloader automatically calculates global statistics (min/max for magnitude, depth, and time deltas) to normalize inputs for the MLP encoders. 
-
-Please ensure your processed `.json` files are placed within the `data/us_earthquake/` directory. For other datasets (Stack Overflow, Chicago Crime, NYC Taxi, Amazon Reviews), please refer to the original TPP-LLM repository.
 
 ## 📝 Citation
 
