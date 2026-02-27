@@ -136,21 +136,19 @@ If you downloaded our pre-trained weights from Hugging Face, you can evaluate th
 2. **Update the config file** (`configs/tpp_llm_ue.config`):
    Comment out or remove `--save_flag` and `--train_flag` so the model doesn't start a new training loop.
 
-3. **Update the bash script** (`tpp-llm_us.sh`):
-   Add `--load_flag \` to the python execution command arguments:
-   ```bash
+3. **Modify the execution script** (`tpp-llm_us.sh`):
+   Open `tpp-llm_us.sh` in a text editor. Scroll to the bottom and add `--load_flag \` to the arguments of the `python` command, like this:
+   ```text
+   # --- Inside tpp-llm_us.sh ---
    python "scripts/us_earthquake_semantic_loss/train_tpp_llm.py" \
      @configs/tpp_llm_ue.config \
-     --dataset_path="${DATASET_PATH}" \
-     --result_save_path="${CUR_RESULT}" \
-     --model_weight_path="${CUR_MODEL_LOAD}" \
-     --weight_path="${CUR_WEIGHT}" \
+     ...
      --seed="${seed}" \
      --beta_semantic="${CUR_BETA_S}" \
-     --load_flag
+     --load_flag  # <--- ADD THIS LINE
    ```
 
-4. **Run the script**:
+4. **Execute the script** from your terminal:
    ```bash
    bash tpp-llm_us.sh
    ```
