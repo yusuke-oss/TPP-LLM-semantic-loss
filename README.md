@@ -5,27 +5,33 @@ This repository provides an extended implementation of **TPP-LLM**, a framework 
 Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062), this project introduces a novel approach to effectively embed continuous numerical data (such as time, earthquake magnitude, and depth) into the LLM's latent space using **Multi-Layer Perceptrons (MLPs)** and **Semantic Alignment Loss** (Concept Anchor Loss).
 
 <div align="center">
-  <img src="images/tpp_llm.png" alt="TPP-LLM Framework" width="1020"/>
+  <img src="images/tpp-llm_semantic_loss.png" alt="TPP-LLM with Semantic Loss Architecture" width="1020"/>
+  <p><em>Overview of our enhanced TPP-LLM architecture. Continuous variables (Time, Magnitude, Depth) are encoded via MLPs and aligned to frozen LLM target anchors using MSE Loss.</em></p>
 </div>
 
 ## 🌟 Features & Novel Contributions
 
 - **Continuous Value Embedding via MLPs**: Directly encodes continuous numerical features (Magnitude, Depth, Time) using specialized MLP encoders, avoiding the precision loss typical in standard tokenization methods.
-- **Semantic Alignment Loss (`beta_semantic`)**: Introduces a custom MSE-based loss function that aligns the output vectors of the MLPs with the pre-trained word embeddings (Anchors) of their respective concepts (e.g., the word "Magnitude"). This ensures the LLM intuitively "understands" the numerical scales.
-- **Parameter-Efficient Fine-Tuning**: Utilizes Low-Rank Adaptation (LoRA) to efficiently fine-tune the LLM for temporal modeling, reducing computational costs while maintaining high performance.
-- **Comprehensive Evaluation & Visualization**: Includes a robust suite of analysis tools (`analysis.py` & `aggregate_metrics.py`) to automatically generate:
+- **Semantic Alignment Loss (`beta_semantic`)**: Introduces a custom MSE-based loss function that aligns the output vectors of the MLPs with the pre-trained word embeddings (Frozen Target Anchors) of their respective concepts. This ensures the LLM intuitively "understands" the numerical scales.
+- **Parameter-Efficient Fine-Tuning**: Utilizes Low-Rank Adaptation (LoRA) to efficiently fine-tune the LLM for temporal modeling, reducing computational costs while keeping the base LLM frozen.
+- **Comprehensive Evaluation & Visualization**: Includes robust tools to automatically generate:
   - Epoch-by-epoch Normalized Confusion Matrices.
   - Qualitative Sequence Trajectory Plots (True vs. Predicted event types/times).
   - 2D Semantic Space Visualizations (PCA) to verify the distance preservation of learned numerical embeddings.
+  - Automated metric extraction and aggregation across multiple experimental seeds.
 
 ## 📂 Directory Structure
 
 ```text
 .
+├── analysis/
+│   └── process_results.py       # Script to extract and summarize best-epoch metrics across seeds
 ├── configs/
 │   └── tpp_llm_ue.config        # Configuration file for US Earthquake experiments
 ├── data/
 │   └── us_earthquake/           # Directory for dataset files (train.json, dev.json, test.json)
+├── images/
+│   └── tpp-llm_semantic_loss.png # Architecture diagrams
 ├── scripts/
 │   └── us_earthquake_semantic_loss/
 │       └── train_tpp_llm.py     # Main entry point for training
@@ -37,8 +43,7 @@ Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062)
 │       ├── layers.py            # Temporal Positional Encoding
 │       ├── utils.py             # Prompt generation for event sequences
 │       ├── common_utils.py      # Reproducibility (Seed) utilities
-│       ├── analysis.py          # Visualization and quantitative metric tools
-│       └── aggregate_metrics.py # Script to aggregate metrics across multiple seeds
+│       └── analysis.py          # Visualization and quantitative metric tools
 ├── tpp-llm_us.sh                # Execution script (runs multiple seeds & betas automatically)
 └── requirements.txt             # Strict version dependencies for reproducibility
 ```
@@ -49,7 +54,7 @@ To ensure full reproducibility of the results reported in this project, please i
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/TPP-LLM.git
+   git clone [https://github.com/your-username/TPP-LLM.git](https://github.com/your-username/TPP-LLM.git)
    cd TPP-LLM
    ```
 
@@ -81,11 +86,13 @@ bash tpp-llm_us.sh
 You can adjust the configuration (e.g., learning rate, LoRA rank, batch size) by editing `configs/tpp_llm_ue.config` or modifying the arguments in the shell script.
 
 ### Aggregating Results
-After running the experiments across multiple seeds, you can easily aggregate the results (Mean ± StdDev) and generate metric plots by running:
+After running the experiments across multiple seeds, you can automatically extract the best epoch from the validation logs and aggregate the final test metrics (Mean ± StdDev) by running:
 
 ```bash
-python src/tpp_llm/us_earthquake_semantic_loss/aggregate_metrics.py
+python analysis/process_results.py
 ```
+
+This will generate a summary text file (e.g., `beta_10000.0_summary.txt`) in your results directory containing the compiled statistics.
 
 ## 📊 Datasets
 
