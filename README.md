@@ -103,29 +103,57 @@ This project utilizes the U.S. Earthquake dataset (2020-2024). We provide a comp
 
 ## 🚀 Usage
 
-### ⚙️ Core Execution Flags
-The behavior of the training script (`train_tpp_llm.py`) is controlled by three main flags. You can mix and match them depending on your goal:
+The behavior of the training script is controlled by execution flags (`--train_flag`, `--save_flag`, `--load_flag`).
 
-* `--train_flag`: Executes the training loop across all epochs.
-* `--save_flag`: Saves the model weights (LoRA adapter + newly added tokens) to the `model_weight_path` whenever a new best validation score is achieved. *(Note: Saved weights are ignored by Git via `.gitignore` to prevent uploading large files).*
-* `--load_flag`: Loads pre-trained model weights from the `model_weight_path` before execution.
+### ⚙️ Configuring the Execution Script (`tpp-llm_us.sh`)
+We provide a bash script to automate training and evaluation across multiple configurations. Before running the script, open `tpp-llm_us.sh` to configure the random seeds and loss coefficients you want to test:
+
+```bash
+# Set the random seeds for robust evaluation
+SEEDS=(42 123 501 1000 2025)
+
+# Set the Semantic Loss coefficients (beta) to test
+BETA_SEMANTICS=(10000.0) 
+```
+The script automatically builds the hierarchical directory structure (`.../beta_10000.0/seed_42/`) and executes the Python script for each combination.
 
 ### Case 1: Training from Scratch
-To train the model from scratch and save the best weights locally, execute the provided bash script. (Ensure `--train_flag` and `--save_flag` are passed in `tpp-llm_us.sh` or `configs/tpp_llm_ue.config`).
+To train the model from scratch and save the best weights locally:
 
-```bash
-bash tpp-llm_us.sh
-```
+1. Open `configs/tpp_llm_ue.config` and ensure `--save_flag` and `--train_flag` are present.
+2. Run the provided bash script:
+   ```bash
+   bash tpp-llm_us.sh
+   ```
 
 ### Case 2: Evaluating a Pre-trained Model
-If you downloaded our pre-trained weights from Hugging Face, you can run an evaluation directly on the test set without training. Pass **only** the `--load_flag`:
+If you downloaded our pre-trained weights from Hugging Face, you can evaluate them directly on the test set without training.
 
-```bash
-python scripts/us_earthquake_semantic_loss/train_tpp_llm.py \
-  @configs/tpp_llm_ue.config \
-  --model_weight_path="path/to/downloaded/weights" \
-  --load_flag
-```
+1. **Place the downloaded weights** into the corresponding local directory. For example, for `seed=42` and `beta_semantic=10000.0`, extract the files into:
+   `save_model/us_earthquake_semantic_loss/beta_10000.0/seed_42/`
+   *(Ensure your dataset is also placed in `data/us_earthquake/`)*
+
+2. **Update the config file** (`configs/tpp_llm_ue.config`):
+   Comment out or remove `--save_flag` and `--train_flag` so the model doesn't start a new training loop.
+
+3. **Update the bash script** (`tpp-llm_us.sh`):
+   Add `--load_flag \` to the python execution command arguments:
+   ```bash
+   python "scripts/us_earthquake_semantic_loss/train_tpp_llm.py" \
+     @configs/tpp_llm_ue.config \
+     --dataset_path="${DATASET_PATH}" \
+     --result_save_path="${CUR_RESULT}" \
+     --model_weight_path="${CUR_MODEL_LOAD}" \
+     --weight_path="${CUR_WEIGHT}" \
+     --seed="${seed}" \
+     --beta_semantic="${CUR_BETA_S}" \
+     --load_flag
+   ```
+
+4. **Run the script**:
+   ```bash
+   bash tpp-llm_us.sh
+   ```
 
 ### 📈 Aggregating Results
 After running experiments across multiple seeds, you can automatically extract the best epoch from the validation logs and aggregate the final test metrics (Mean ± StdDev) by running:
