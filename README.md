@@ -69,7 +69,7 @@ To ensure full reproducibility of the results reported in this project, please i
 1. Clone the repository:
    ```bash
    git clone https://github.com/yusuke-oss/TPP-LLM-semantic-loss.git
-   cd TPP-LLM
+   cd TPP-LLM-semantic-loss
    ```
 
 2. We highly recommend using a virtual environment (e.g., Conda):
@@ -179,7 +179,7 @@ If you find this code or the original TPP-LLM framework useful in your research,
 
 ## ❓ Questions or Issues
 
-If you have any questions or encounter any issues, please feel free to [submit an issue](https://github.com/your-username/TPP-LLM/issues) on our GitHub repository.
+If you have any questions or encounter any issues, please feel free to [submit an issue](https://github.com/yusuke-oss/TPP-LLM-semantic-loss/issues) on our GitHub repository.
 
 ## 🙏 Acknowledgment
 
