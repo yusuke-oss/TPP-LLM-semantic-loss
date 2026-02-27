@@ -1,56 +1,64 @@
-# TPP-LLM-semantic-loss
-**TPP-LLM: A Study on Embedding Numerical Data into Language Space in LLM-Driven Point Process Analysis**
-*(大規模言語モデル駆動型点過程解析における数値データの言語空間への埋め込み手法の検討)*
+# TPP-LLM: Modeling Temporal Point Processes with Semantic Alignment for Continuous Data
 
-Official PyTorch implementation of TPP-LLM with MLP embedding method and semantic loss.
+This repository provides an extended implementation of **TPP-LLM**, a framework that integrates Temporal Point Processes (TPPs) with Large Language Models (LLMs) for event sequence prediction. 
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062), this project introduces a novel approach to effectively embed continuous numerical data (such as time, earthquake magnitude, and depth) into the LLM's latent space using **Multi-Layer Perceptrons (MLPs)** and **Semantic Alignment Loss** (Concept Anchor Loss).
 
-## Key Designs
+<div align="center">
+  <img src="images/tpp_llm.png" alt="TPP-LLM Framework" width="1020"/>
+</div>
 
-:star2: **LLM-Based Event Prediction**: Leverages the strong reasoning capabilities of base LLMs (e.g., TinyLlama) via LoRA (Low-Rank Adaptation) fine-tuning to predict complex continuous-time event sequences.
+## 🌟 Features & Novel Contributions
 
-:star2: **MLP Value-to-Vector Encoders**: Replaces standard categorical embeddings with MLP-based encoders to seamlessly project continuous numerical values into the LLM's high-dimensional space.
+- **Continuous Value Embedding via MLPs**: Directly encodes continuous numerical features (Magnitude, Depth, Time) using specialized MLP encoders, avoiding the precision loss typical in standard tokenization methods.
+- **Semantic Alignment Loss (`beta_semantic`)**: Introduces a custom MSE-based loss function that aligns the output vectors of the MLPs with the pre-trained word embeddings (Anchors) of their respective concepts (e.g., the word "Magnitude"). This ensures the LLM intuitively "understands" the numerical scales.
+- **Parameter-Efficient Fine-Tuning**: Utilizes Low-Rank Adaptation (LoRA) to efficiently fine-tune the LLM for temporal modeling, reducing computational costs while maintaining high performance.
+- **Comprehensive Evaluation & Visualization**: Includes a robust suite of analysis tools (`analysis.py` & `aggregate_metrics.py`) to automatically generate:
+  - Epoch-by-epoch Normalized Confusion Matrices.
+  - Qualitative Sequence Trajectory Plots (True vs. Predicted event types/times).
+  - 2D Semantic Space Visualizations (PCA) to verify the distance preservation of learned numerical embeddings.
 
-:star2: **Semantic Alignment Loss**: Introduces a novel semantic loss (`beta_semantic`) that forces the numerical embeddings (Magnitude, Depth, Time) to align with the pre-trained semantic word embeddings (Anchor words) of the LLM.
+## 📂 Directory Structure
 
-### Model Architectures
+```text
+.
+├── configs/
+│   └── tpp_llm_ue.config        # Configuration file for US Earthquake experiments
+├── data/
+│   └── us_earthquake/           # Directory for dataset files (train.json, dev.json, test.json)
+├── scripts/
+│   └── us_earthquake_semantic_loss/
+│       └── train_tpp_llm.py     # Main entry point for training
+├── src/
+│   └── tpp_llm/us_earthquake_semantic_loss/
+│       ├── model.py             # Core model with MLP encoders and Semantic Loss
+│       ├── runner.py            # Training loop and evaluation logic
+│       ├── data.py              # Dataset loader and global statistics calculator
+│       ├── layers.py            # Temporal Positional Encoding
+│       ├── utils.py             # Prompt generation for event sequences
+│       ├── common_utils.py      # Reproducibility (Seed) utilities
+│       ├── analysis.py          # Visualization and quantitative metric tools
+│       └── aggregate_metrics.py # Script to aggregate metrics across multiple seeds
+├── tpp-llm_us.sh                # Execution script (runs multiple seeds & betas automatically)
+└── requirements.txt             # Strict version dependencies for reproducibility
+```
 
-The following images provide visual representations of the TPP-LLM architecture and the Semantic Alignment concept.
+## 🛠️ Installation
 
-![TPP-LLM Architecture](images)
-*Figure 1: The architecture of the TPP-LLM model.*
-
-## Results
-
-### Performance Comparison
-
-The enhanced TPP-LLM model with Semantic Alignment Loss demonstrates significant improvements in forecasting accuracy (both Time RMSE and Type Accuracy) compared to baseline models without concept alignment.
-
-![Performance Comparison]([ここにConfusion Matrixなどの結果画像のURLを貼ります])
-*Figure 3: Normalized Confusion Matrix and Absolute Time RMSE evaluation.*
-
-### Visualizations
-
-The following visualizations illustrate the effectiveness of our semantic loss. The continuous values correctly form a trajectory towards the target semantic anchors (e.g., "Large Magnitude").
-
-![Visualization 1]([ここに分析コードで出力した2D_Magnitude_Untitled.pngなどのURLを貼ります])
-![Visualization 2]([ここに分析コードで出力したqualitative_plotsなどのURLを貼ります])
-
-
-## Installation
+To ensure full reproducibility of the results reported in this project, please install the exact versions of the dependencies specified in the `requirements.txt`. 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/zefang-liu/TPP-LLM
+   git clone https://github.com/your-username/TPP-LLM.git
    cd TPP-LLM
    ```
-2.  
+
+2. We highly recommend using a virtual environment (e.g., Conda):
    ```bash
-   conda create -n <env name> python=3.13.2
+   conda create -n tpp-llm python=3.10 -y
+   conda activate tpp-llm
    ```
+
 3. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
@@ -58,78 +66,54 @@ The following visualizations illustrate the effectiveness of our semantic loss. 
 
 4. Add the source code to your Python path:
    ```bash
-   export PYTHONPATH=$PYTHONPATH:<path-to-your-folder>/src
+   export PYTHONPATH=$PYTHONPATH:$(pwd)
    ```
 
+## 🚀 Usage
 
-5. **Data Preparation**:
-   Place your preprocessed datasets (`train.json`, `dev.json`, `test.json`) in the `./data/us_earthquake` directory.
+### Running Experiments
+To train and evaluate the model using the US Earthquake dataset across multiple random seeds, simply execute the provided bash script. This script automatically handles directory creation and iterates over the defined seeds.
 
-6. **Run the experiments**:
-   Execute the training script with the specified parameters:
-   ```bash
-   python train_tpp_llm.py \
-       --model_path TinyLlama/TinyLlama-1.1B-Chat-v1.0 \
-       --dataset_path data/us_earthquake \
-       --num_event_types 3 \
-       --temporal_emb_type MLP \
-       --peft_type lora \
-       --beta_semantic 1.0 \
-       --num_epochs 10 \
-       --train_batch_size 16 \
-       --result_save_path results/earthquake_experiment \
-       --model_weight_path weights/earthquake_model \
-       --save_flag \
-       --train_flag
-   ```
-   ```bash
-   bash tpp-llm_us.sh
-   ```
-
-## Datasets
-
-The cleaned data used in this project can be downloaded from [Hugging Face](https://huggingface.co/datasets/yyyxz12047/Earthquake-Dataset-add-magnitude-and-depth). Or you can download and preprocess raw data by running the notebook [`notebooks/tpp_data.ipynb`](notebooks/tpp_data.ipynb). Supported datasets include:
-
-- U.S. Earthquake
-
-Processed datasets will be stored in the `data/` directory.
-
-## File Structure
-
-The repository is organized as follows:
-
-```plaintext
-.
-├── README.md
-├── requirements.txt
-├── train_tpp_llm.py             # Main script to run the model training and evaluation
-├── data/
-│   └── us_earthquake/           # Directory for dataset files (train.json, etc.)
-├── results/                     # Directory where evaluation logs and plots are saved
-├── weights/                     # Directory for trained LoRA model checkpoints
-└── src/
-    └── tpp_llm/
-        └── us_earthquake_semantic_loss/
-            ├── analysis.py      # Comprehensive evaluation, PCA visualizations, and metric logs
-            ├── data.py          # Data loader and preprocessing (TPPLLMDataset)
-            ├── layers.py        # Custom embedding layers (e.g., TimePositionalEncoding)
-            ├── model.py         # Core TPP-LLM architecture and Semantic Loss calculation
-            └── runner.py        # Training loop, evaluation steps, and gradient accumulation
+```bash
+bash tpp-llm_us.sh
 ```
 
-## Explanation of Key Files and Directories
+You can adjust the configuration (e.g., learning rate, LoRA rank, batch size) by editing `configs/tpp_llm_ue.config` or modifying the arguments in the shell script.
 
-- **`README.md`**: This file, providing an overview of the project and instructions for setup and usage.
-- **`train_tpp_llm.py`**: Main entry point to execute the model training and evaluation.
-- **`src/.../model.py`**: Contains the `TPPLLMModel` class. It manages the LoRA LLM wrapper, MLP encoders, and computes the `semantic_loss`.
-- **`src/.../runner.py`**: The `TPPLLMRunner` class that handles the epoch loops, backpropagation, and logging.
-- **`src/.../analysis.py`**: A powerful evaluation suite that generates Confusion Matrices, Sequence Trajectory Plots, and 2D PCA Semantic Space Visualizations.
-- **`results/`**: The output directory containing `quantitative_metrics/`, `semantic_visualizations/`, and `consistency_plots/`.
+### Aggregating Results
+After running the experiments across multiple seeds, you can easily aggregate the results (Mean ± StdDev) and generate metric plots by running:
 
-## Acknowledgement
+```bash
+python src/tpp_llm/us_earthquake_semantic_loss/aggregate_metrics.py
+```
 
-We appreciate the open-source community, especially the developers of [Hugging Face Transformers](https://github.com/huggingface/transformers) and [PEFT](https://github.com/huggingface/peft) for providing the valuable code base.
+## 📊 Datasets
 
-## Contact
+This project includes configurations tailored for the **U.S. Earthquake** dataset. The dataloader automatically calculates global statistics (min/max for magnitude, depth, and time deltas) to normalize inputs for the MLP encoders. 
 
-If you have any questions or concerns, please submit an issue on GitHub.
+Please ensure your processed `.json` files are placed within the `data/us_earthquake/` directory. For other datasets (Stack Overflow, Chicago Crime, NYC Taxi, Amazon Reviews), please refer to the original TPP-LLM repository.
+
+## 📝 Citation
+
+If you find this code or the original TPP-LLM framework useful in your research, please cite the foundational [paper](https://arxiv.org/abs/2410.02062):
+
+```bibtex
+@article{liu2024tppllmm,
+  title={TPP-LLM: Modeling Temporal Point Processes by Efficiently Fine-Tuning Large Language Models},
+  author={Liu, Zefang and Quan, Yinzhu},
+  journal={arXiv preprint arXiv:2410.02062},
+  year={2024}
+}
+```
+
+## ❓ Questions or Issues
+
+If you have any questions or encounter any issues, please feel free to [submit an issue](https://github.com/your-username/TPP-LLM/issues) on our GitHub repository.
+
+## 🙏 Acknowledgment
+
+We sincerely thank the authors of the original **[TPP-LLM](https://github.com/zefang-liu/TPP-LLM)** for their excellent contribution to the field of event sequence prediction. We would also like to thank the developers of [EasyTPP](https://github.com/ant-research/EasyTemporalPointProcess) for their valuable implementation of TPPs.
+
+## 📜 License
+
+This project is licensed under the [Apache-2.0 License](LICENSE).

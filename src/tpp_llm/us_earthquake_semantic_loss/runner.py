@@ -425,8 +425,6 @@ class TPPLLMRunner(object):
                         all_types_true_test, all_types_pred_test, all_times_true_test, all_time_preds_test, all_time_deltas_true_test,
                         result_save_path, f"test", epoch, seq_scores_test
                     )
-                    with open(os.path.join(result_save_path, "seq_scores_best_test.json"), "w") as f:
-                        json.dump(seq_scores_test, f)
 
 
     def save(self, model_weight_path: str, weight_path: str):
