@@ -18,7 +18,6 @@ Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062)
 - **Comprehensive Evaluation & Visualization**: Includes robust tools to automatically generate:
   - Epoch-by-epoch Normalized Confusion Matrices.
   - Qualitative Sequence Trajectory Plots (True vs. Predicted event types/times).
-  - 2D Semantic Space Visualizations (PCA) to verify the distance preservation of learned numerical embeddings.
   - Automated metric extraction and aggregation across multiple experimental seeds.
 
 ## 🤗 Pre-trained Models & Datasets
