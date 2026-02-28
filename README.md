@@ -12,7 +12,7 @@ Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062)
 ## 🌟 Features & Novel Contributions
 
 - **Continuous Value Embedding via MLPs**: Directly encodes continuous numerical features (Magnitude, Depth, Time) using specialized MLP encoders, avoiding the precision loss typical in standard tokenization methods.
-- **Semantic Loss (`beta_semantic`)**: Introduces a custom MSE-based loss function that aligns the output vectors of the MLPs with the pre-trained word embeddings (Frozen Target Anchors) of their respective concepts. This ensures the LLM intuitively "understands" the numerical scales.
+- **Semantic Loss (`beta_semantic`)**: Introduces a custom MSE-based loss function that aligns the output vectors of the MLPs with the pre-trained word embeddings of their respective concepts. This ensures the LLM intuitively "understands" the numerical scales.
 - **Dynamic Token & Prompt Management**: Automatically controls the insertion of structural/delimiter tokens (e.g., `<|time_prefix|>`) and dynamically adjusts the LLM's system prompts based on the selected embedding strategy (Proposed MLP vs. Baseline TPE).
 - **Parameter-Efficient Fine-Tuning**: Utilizes Low-Rank Adaptation (LoRA) to efficiently fine-tune the LLM for temporal modeling, reducing computational costs while keeping the base LLM frozen.
 - **Comprehensive Evaluation & Visualization**: Includes robust tools to automatically generate:
