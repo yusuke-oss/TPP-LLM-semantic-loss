@@ -22,7 +22,7 @@ Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062)
 
 ## 🤗 Pre-trained Models & Datasets
 
-For easy reproducibility and immediate evaluation, we provide the fully processed dataset and our trained model weights (trained with `seed=42`) on Hugging Face:
+For easy reproducibility and immediate evaluation, we provide the fully processed dataset and our trained model weights on Hugging Face:
 
 - **📊 Dataset (U.S. Earthquake)**: [Download from Hugging Face](https://huggingface.co/datasets/yyyxz12047/TPP-LLM-semantic-loss)
 - **🧠 Model Weights**: [Download from Hugging Face](https://huggingface.co/yyyxz12047/TPP-LLM-semantic-loss)
@@ -99,8 +99,6 @@ This project utilizes the U.S. Earthquake dataset (2020-2024). We provide a comp
    - Filter and group earthquakes into discrete sequences based on location and time.
    - Extract continuous values (`magnitude`, `depth`, `time_since_start`).
    - Split the data into 80/10/10 and generate `train.json`, `dev.json`, and `test.json` in the `data/us_earthquake/` directory.
-
-*(Note: The `data.py` loader will automatically calculate the min/max statistics across these JSON files to dynamically normalize inputs for the MLP encoders).*
 
 ## 🚀 Usage
 
