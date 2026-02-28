@@ -185,7 +185,7 @@ If you find this code or the original TPP-LLM framework useful in your research,
       eprint={2410.02062},
       archivePrefix={arXiv},
       primaryClass={cs.LG},
-      url={[https://arxiv.org/abs/2410.02062](https://arxiv.org/abs/2410.02062)}, 
+      url={https://arxiv.org/abs/2410.02062}, 
 }
 ```
 
