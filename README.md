@@ -40,7 +40,7 @@ For easy reproducibility and immediate evaluation, we provide the fully processe
 ├── data/
 │   └── us_earthquake/           # Processed datasets (train.json, dev.json, test.json)
 ├──file_sh/
-    └── tpp-llm_us.sh            # Execution script (runs multiple seeds & betas automatically)
+│   └── tpp-llm_us.sh            # Execution script (runs multiple seeds & betas automatically)
 ├── images/
 │   └── tpp-llm_semantic_loss.png # Architecture diagrams
 ├── notebooks/
