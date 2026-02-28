@@ -2,7 +2,7 @@
 
 This repository provides an extended implementation of **TPP-LLM**, a framework that integrates Temporal Point Processes (TPPs) with Large Language Models (LLMs) for event sequence prediction. 
 
-Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062), this project introduces a novel approach to effectively embed continuous numerical data (such as time, earthquake magnitude, and depth) into the LLM's latent space using **Multi-Layer Perceptrons (MLPs)** and **Semantic Alignment Loss** (Concept Anchor Loss).
+Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062), this project introduces a novel approach to effectively embed continuous numerical data (such as time, earthquake magnitude, and depth) into the LLM's latent space using **Multi-Layer Perceptrons (MLPs)** and **Semantic Loss** (Concept Anchor Loss).
 
 <div align="center">
   <img src="images/tpp-llm_semantic_loss.png" alt="TPP-LLM with Semantic Loss Architecture" width="1020"/>
@@ -12,7 +12,7 @@ Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062)
 ## 🌟 Features & Novel Contributions
 
 - **Continuous Value Embedding via MLPs**: Directly encodes continuous numerical features (Magnitude, Depth, Time) using specialized MLP encoders, avoiding the precision loss typical in standard tokenization methods.
-- **Semantic Alignment Loss (`beta_semantic`)**: Introduces a custom MSE-based loss function that aligns the output vectors of the MLPs with the pre-trained word embeddings (Frozen Target Anchors) of their respective concepts. This ensures the LLM intuitively "understands" the numerical scales.
+- **Semantic Loss (`beta_semantic`)**: Introduces a custom MSE-based loss function that aligns the output vectors of the MLPs with the pre-trained word embeddings (Frozen Target Anchors) of their respective concepts. This ensures the LLM intuitively "understands" the numerical scales.
 - **Dynamic Token & Prompt Management**: Automatically controls the insertion of structural/delimiter tokens (e.g., `<|time_prefix|>`) and dynamically adjusts the LLM's system prompts based on the selected embedding strategy (Proposed MLP vs. Baseline TPE).
 - **Parameter-Efficient Fine-Tuning**: Utilizes Low-Rank Adaptation (LoRA) to efficiently fine-tune the LLM for temporal modeling, reducing computational costs while keeping the base LLM frozen.
 - **Comprehensive Evaluation & Visualization**: Includes robust tools to automatically generate:
@@ -26,7 +26,7 @@ Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062)
 For easy reproducibility and immediate evaluation, we provide the fully processed dataset and our trained model weights (trained with `seed=42`) on Hugging Face:
 
 - **📊 Dataset (U.S. Earthquake)**: [Download from Hugging Face](https://huggingface.co/datasets/yyyxz12047/TPP-LLM-semantic-loss)
-- **🧠 Model Weights (TPP-LLM Semantic Loss)**: [Download from Hugging Face](https://huggingface.co/yyyxz12047/TPP-LLM-semantic-loss)
+- **🧠 Model Weights**: [Download from Hugging Face](https://huggingface.co/yyyxz12047/TPP-LLM-semantic-loss)
 
 *You can download the dataset and place it directly into the `data/us_earthquake/` directory to skip the preprocessing step. Similarly, downloading the model weights allows you to run evaluations immediately without training from scratch.*
 
