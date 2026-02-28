@@ -72,33 +72,36 @@ class TPPLLMModel(nn.Module):
                     param.requires_grad = False
             
             self.old_vocab_size = self.llm.get_input_embeddings().num_embeddings
-            
+            # Added: Flag to disable tokens when using TPE (positional)
+            self.use_tokens = (temporal_emb_type == 'MLP')
             # Add special event tokens
-            event_tokens = [
+            if self.use_tokens:
+                event_tokens = [
             
-                AddedToken("<|start_of_event|>", special=True, lstrip=False, rstrip=False),
-                AddedToken("<|end_of_event|>", special=True, lstrip=False, rstrip=False),
-                AddedToken("<|time_prefix|>", special=True, lstrip=False, rstrip=False),
-                AddedToken("<|type_prefix|>", special=True, lstrip=False, rstrip=False),
-                AddedToken("<|magnitude_prefix|>", special=True, lstrip=False, rstrip=False),
-                AddedToken("<|depth_prefix|>", special=True, lstrip=False, rstrip=False),
-                AddedToken("<|im_start|>", special=True, lstrip=False, rstrip=False),
-                AddedToken("<|im_end|>", special=True, lstrip=False, rstrip=False),
-            ]
-            self.old_vocab_size = len(self.tokenizer)
-            self.tokenizer.add_tokens(event_tokens, special_tokens=True)
-            self.llm.resize_token_embeddings(len(self.tokenizer))
+                    AddedToken("<|start_of_event|>", special=True, lstrip=False, rstrip=False),
+                    AddedToken("<|end_of_event|>", special=True, lstrip=False, rstrip=False),
+                    AddedToken("<|time_prefix|>", special=True, lstrip=False, rstrip=False),
+                    AddedToken("<|type_prefix|>", special=True, lstrip=False, rstrip=False),
+                    AddedToken("<|magnitude_prefix|>", special=True, lstrip=False, rstrip=False),
+                    AddedToken("<|depth_prefix|>", special=True, lstrip=False, rstrip=False),
+                    AddedToken("<|im_start|>", special=True, lstrip=False, rstrip=False),
+                    AddedToken("<|im_end|>", special=True, lstrip=False, rstrip=False),
+                ]
+                self.old_vocab_size = len(self.tokenizer)
+                self.tokenizer.add_tokens(event_tokens, special_tokens=True)
+                self.llm.resize_token_embeddings(len(self.tokenizer))
             
-            print(f"[TPPLLMModel] old_vocab_size={getattr(self,'old_vocab_size', None)}, "
-                f"total_vocab={len(self.tokenizer)}, "
-                f"embedding_dim={self.llm.get_input_embeddings().embedding_dim}")
+                print(f"[TPPLLMModel] old_vocab_size={getattr(self,'old_vocab_size', None)}, "
+                    f"total_vocab={len(self.tokenizer)}, "
+                    f"embedding_dim={self.llm.get_input_embeddings().embedding_dim}")
             
             # Allow gradients only for the newly added token embeddings
-            try:
-                self.llm_embedder = self.llm.get_input_embeddings()
-                self.llm_embedder.weight.requires_grad = True
-            except Exception as e:
-                print("Warning: failed to set embedding requires_grad, exception:", e)
+                try:
+                    self.llm_embedder = self.llm.get_input_embeddings()
+                    self.llm_embedder.weight.requires_grad = True
+                except Exception as e:
+                    print("Warning: failed to set embedding requires_grad, exception:", e)
+            self.llm_embedder = self.llm.get_input_embeddings()
             # Initialize concept anchors
             self._init_concept_anchors()
             
@@ -268,7 +271,6 @@ class TPPLLMModel(nn.Module):
         all_time_vals, all_mag_vals, all_dep_vals = [], [], []
         aux_data=[]
         
-        
         # Process each event sequence in the batch
         for event_times, event_texts,event_mag,event_dep  in zip(batch_event_times,
                                                                batch_event_texts,batch_event_mag,batch_event_dep):
@@ -279,29 +281,38 @@ class TPPLLMModel(nn.Module):
             sequence_attention_mask = []
             event_emb_indices = []
 
-            im_start_texts1=["<|im_start|> system"]
-            im_end_texts=["<|im_end|>"]
-            im_start_texts2=["<|im_start|> sequence"]
+            if self.use_tokens:
+                im_start_texts1=["<|im_start|> system"]
+                im_end_texts=["<|im_end|>"]
+                im_start_texts2=["<|im_start|> sequence"]
+                start_event_texts=["<|start_of_event|>"]
+                end_event_texts=["<|end_of_event|>"]
+                time_event_texts=["<|time_prefix|>"]
+                type_event_texts=["<|type_prefix|>"]
+                mag_event_texts=["<|magnitude_prefix|>"]
+                dep_event_texts=["<|depth_prefix|>"]
+            
+            if self.use_tokens:
+                im_start_text_embeddings1= self.embed_event_text(im_start_texts1)
+                im_end_text_embedding= self.embed_event_text(im_end_texts)
+                im_start_text_embeddings2= self.embed_event_text(im_start_texts2)
 
-            im_start_text_embeddings1= self.embed_event_text(im_start_texts1)
-            im_end_text_embedding= self.embed_event_text(im_end_texts)
-            im_start_text_embeddings2= self.embed_event_text(im_start_texts2)
-
-            for im_start_text_embedding1 in im_start_text_embeddings1[0]:
-                sequence_embeddings.append(im_start_text_embedding1)
-                sequence_attention_mask.append(1)
+                for im_start_text_embedding1 in im_start_text_embeddings1[0]:
+                    sequence_embeddings.append(im_start_text_embedding1)
+                    sequence_attention_mask.append(1)
             
             # Add the prompt embeddings
             for prompt_token_embedding in prompt_token_embeddings_tensor :
                 sequence_embeddings.append(prompt_token_embedding)
                 sequence_attention_mask.append(1)
-                
-            sequence_embeddings.append(im_end_text_embedding[0].squeeze(0))
-            sequence_attention_mask.append(1)
 
-            for im_start_text_embedding2 in im_start_text_embeddings2[0]:
-                sequence_embeddings.append(im_start_text_embedding2)
+            if self.use_tokens:    
+                sequence_embeddings.append(im_end_text_embedding[0].squeeze(0))
                 sequence_attention_mask.append(1)
+
+                for im_start_text_embedding2 in im_start_text_embeddings2[0]:
+                    sequence_embeddings.append(im_start_text_embedding2)
+                    sequence_attention_mask.append(1)
 
             # Get the temporal embeddings for event times
             if self.temporal_emb_type == 'MLP':
@@ -322,80 +333,83 @@ class TPPLLMModel(nn.Module):
                 event_mag_embeddings = self.temporal_embedder(event_mag.unsqueeze(-1))  # (seq_len, embedding_dim)
                 event_dep_embeddings = self.temporal_embedder(event_dep.unsqueeze(-1))  # (seq_len, embedding_dim)
             
-            start_event_texts=["<|start_of_event|>"]
-            end_event_texts=["<|end_of_event|>"]
-            time_event_texts=["<|time_prefix|>"]
-            type_event_texts=["<|type_prefix|>"]
-            mag_event_texts=["<|magnitude_prefix|>"]
-            dep_event_texts=["<|depth_prefix|>"]
             
-            start_event_text_embedding = self.embed_event_text(start_event_texts)
-            end_event_text_embedding = self.embed_event_text(end_event_texts)
-            time_event_text_embedding= self.embed_event_text(time_event_texts)
-            type_event_text_embedding= self.embed_event_text(type_event_texts)
-            mag_event_text_embedding= self.embed_event_text(mag_event_texts)
-            dep_event_text_embedding= self.embed_event_text(dep_event_texts)
+            if self.use_tokens:
+                start_event_text_embedding = self.embed_event_text(start_event_texts)
+                end_event_text_embedding = self.embed_event_text(end_event_texts)
+                time_event_text_embedding= self.embed_event_text(time_event_texts)
+                type_event_text_embedding= self.embed_event_text(type_event_texts)
+                mag_event_text_embedding= self.embed_event_text(mag_event_texts)
+                dep_event_text_embedding= self.embed_event_text(dep_event_texts)
+            
             event_text_embeddings = self.embed_event_text(event_texts)  # [(text_token_len, embedding_dim), ...]
             
             for temporal_embedding, event_token_embedding,event_mag_embedding,event_dep_embedding in zip(temporal_embeddings,event_text_embeddings,event_mag_embeddings,event_dep_embeddings):
-                sequence_embeddings.append(start_event_text_embedding[0].squeeze(0))
-                sequence_attention_mask.append(1)
+                if self.use_tokens:
+                    sequence_embeddings.append(start_event_text_embedding[0].squeeze(0))
+                    sequence_attention_mask.append(1)
                 
                 if self.temporal_emb_first:
                     # Add the event time embedding, temporal_embedding: (embedding_dim,)
-                    sequence_embeddings.append(time_event_text_embedding[0].squeeze(0))
-                    sequence_attention_mask.append(1)
+                    if self.use_tokens:
+                        sequence_embeddings.append(time_event_text_embedding[0].squeeze(0))
+                        sequence_attention_mask.append(1)
 
                     sequence_embeddings.append(temporal_embedding)
                     sequence_attention_mask.append(1)
 
                     # Add event text token embeddings, event_token_embedding: (embedding_dim,)
-                    sequence_embeddings.append(type_event_text_embedding[0].squeeze(0))
-                    sequence_attention_mask.append(1)
+                    if self.use_tokens:
+                        sequence_embeddings.append(type_event_text_embedding[0].squeeze(0))
+                        sequence_attention_mask.append(1)
                     for event_token_embedding1 in event_token_embedding:
                         sequence_embeddings.append(event_token_embedding1)
                         sequence_attention_mask.append(1)
-                    
-                    sequence_embeddings.append(mag_event_text_embedding[0].squeeze(0))
-                    sequence_attention_mask.append(1)
-                    
+
+                    if self.use_tokens:
+                        sequence_embeddings.append(mag_event_text_embedding[0].squeeze(0))
+                        sequence_attention_mask.append(1)
                     sequence_embeddings.append(event_mag_embedding)
                     sequence_attention_mask.append(1)
 
-                    sequence_embeddings.append(dep_event_text_embedding[0].squeeze(0))
-                    sequence_attention_mask.append(1)
-                    
+                    if self.use_tokens:
+                        sequence_embeddings.append(dep_event_text_embedding[0].squeeze(0))
+                        sequence_attention_mask.append(1)
                     sequence_embeddings.append(event_dep_embedding)
                     sequence_attention_mask.append(1)
 
                 else:
                     # Add event text token embeddings, event_token_embedding: (embedding_dim,)
-                    sequence_embeddings.append(type_event_text_embedding[0].squeeze(0))
-                    sequence_attention_mask.append(1)
+                    if self.use_tokens:
+                        sequence_embeddings.append(type_event_text_embedding[0].squeeze(0))
+                        sequence_attention_mask.append(1)
                     for event_token_embedding1 in event_token_embedding:
                         sequence_embeddings.append(event_token_embedding1)
                         sequence_attention_mask.append(1)
                     
-                    sequence_embeddings.append(mag_event_text_embedding[0].squeeze(0))
-                    sequence_attention_mask.append(1)
-                    
+                    if self.use_tokens:
+                        sequence_embeddings.append(mag_event_text_embedding[0].squeeze(0))
+                        sequence_attention_mask.append(1)
                     sequence_embeddings.append(event_mag_embedding)
                     sequence_attention_mask.append(1)
 
-                    sequence_embeddings.append(dep_event_text_embedding[0].squeeze(0))
-                    sequence_attention_mask.append(1)
-                    
+                    if self.use_tokens:
+                        sequence_embeddings.append(dep_event_text_embedding[0].squeeze(0))
+                        sequence_attention_mask.append(1)
                     sequence_embeddings.append(event_dep_embedding)
                     sequence_attention_mask.append(1)
                 
                     # Add the event time embedding, temporal_embedding: (embedding_dim,)
-                    sequence_embeddings.append(time_event_text_embedding[0].squeeze(0))
-                    sequence_attention_mask.append(1)
+                    if self.use_tokens:
+                        sequence_embeddings.append(time_event_text_embedding[0].squeeze(0))
+                        sequence_attention_mask.append(1)
                     sequence_embeddings.append(temporal_embedding)
                     sequence_attention_mask.append(1)
                 # Record the index of the last embedding of this event
-                sequence_embeddings.append(end_event_text_embedding[0].squeeze(0))
-                sequence_attention_mask.append(1)
+                if self.use_tokens:
+                    sequence_embeddings.append(end_event_text_embedding[0].squeeze(0))
+                    sequence_attention_mask.append(1)
+
                 event_emb_indices.append(len(sequence_embeddings) - 1)
 
             # Convert sequence embeddings to tensors

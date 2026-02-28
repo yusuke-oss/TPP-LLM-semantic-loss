@@ -98,7 +98,6 @@ def visualize_qualitative_sequence(raw_data, save_dir, phase_name, epoch, num_ex
                  linestyle='--', label='Predicted Time', alpha=0.8)
         ax2.set_ylim(bottom=0) 
         
-        # ★ 修正: 凡例（Legend）を追加 ★
         ax2.legend(loc='upper left', bbox_to_anchor=(1.02, 1.0), frameon=True, fontsize=12)
 
         ax2.text(1.02, 0.0, rmse_str, transform=ax2.transAxes, fontsize=12, 

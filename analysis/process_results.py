@@ -170,41 +170,43 @@ def summarize_results(results, output_file=None, exp_name=""):
 
 
 def main():
-    # 1. Base directory to scan
-    base_search_dir = "result/us_earthquake_semantic_loss/beta_10000.0"
+    # Modified: Change the base search directory to the root folder
+    base_search_dir = "result/us_earthquake_semantic_loss"
     
-    # 2. Destination directory for the summary
+    # Set the output directory to the same location
     output_summary_dir = base_search_dir
     
-    # 3. Pattern for seed folders
+    # For regex pattern matching
     seed_pattern = re.compile(r"^seed_(\d+)$")
-    
     experiment_groups = collections.defaultdict(list)
     
     print(f"Recursively scanning '{base_search_dir}' using os.walk...")
-
     found_any_seeds = False
 
     try:
-        # Scan all directories under the base_search_dir
+        # Recursively traverse directories
         for root, dirs, files in os.walk(base_search_dir, topdown=True, followlinks=False):
 
-            # 4. Look for folders that contain both 'val.txt' and 'test.txt'
+            # Find folders that contain both 'val.txt' and 'test.txt' (completed seed folders)
             if 'val.txt' in files and 'test.txt' in files:
                 
-                seed_folder_path = root
-                seed_folder_name = os.path.basename(seed_folder_path)
-                parent_dir_path = os.path.dirname(seed_folder_path)
-                exp_name = os.path.basename(parent_dir_path) # ここで "beta_10000.0" という名前を取得
-                
-                # ★修正: スキップ判定（if parent_dir_path == base_search_dir: continue）を削除しました
-                    
+                seed_folder_name = os.path.basename(root)
                 match = seed_pattern.match(seed_folder_name)
+                
                 if match:
                     seed = int(match.group(1))
+                    
+                    # Modified: Use the relative path between the root folder and the seed folder as the experiment group name
+                    # Example: Extract "mlp/beta_10000.0" or "positional"
+                    parent_dir_path = os.path.dirname(root)
+                    rel_path = os.path.relpath(parent_dir_path, base_search_dir)
+                    
+                    # Replace directory separators (e.g., '/') with underscores ('_') to make it a safe filename
+                    exp_name = rel_path.replace(os.sep, '_')
+                    
                     experiment_groups[exp_name].append({
                         'seed': seed,
-                        'path': seed_folder_path
+                        'path': root
                     })
                     found_any_seeds = True
 
@@ -216,13 +218,13 @@ def main():
         return
 
     if not found_any_seeds:
-        print(f"Could not find a '[Experiment Group]/seed_NNN' structure containing 'val.txt'/'test.txt' inside '{base_search_dir}'.")
+        print(f"Could not find any completed experiments in '{base_search_dir}'.")
         return
         
     print(f"\nDetected {len(experiment_groups)} experiment group(s) in '{base_search_dir}'.")
     print("-" * 30)
 
-    # 5. Process each experiment group sequentially
+    # 5. Aggregate and save results for each experiment group (e.g., mlp_beta_10000.0, positional)
     for exp_name, runs_list in experiment_groups.items():
         print(f"\n=======================================================")
         print(f"  Starting processing for Experiment Group '{exp_name}' ({len(runs_list)} seeds)")
@@ -231,7 +233,7 @@ def main():
         results = process_experiment_group(runs_list)
         
         if results:
-            # exp_name が "beta_10000.0" になるので、beta_10000.0_summary.txt として保存されます
+            # Example: Output as "mlp_beta_10000.0_summary.txt" or "positional_summary.txt"
             output_filename = os.path.join(output_summary_dir, f"{exp_name}_summary.txt")
             summarize_results(results, output_filename, exp_name)
         else:

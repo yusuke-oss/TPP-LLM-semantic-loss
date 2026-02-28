@@ -8,24 +8,19 @@
 SEEDS=(42 123 501 1000 2025)
 
 # =========================================================
-#   Path and Parameter Settings (Ensure array lengths match)
+# ★ Experiment Mode Switch
+# Simply change to "MLP" or "positional" and all paths will be adjusted automatically
+# =========================================================
+TEMP_EMB_TYPE="MLP"
+
+# =========================================================
+#   Path and Parameter Settings
 # =========================================================
 
-BASE_DATASET_PATHS=(
-  "data/us_earthquake"
-)
-
-BASE_RESULT_PATHS=( 
-  "result/us_earthquake_semantic_loss"
-)
-
-BASE_MODEL_LOAD_PATHS=(
-  "save_model/us_earthquake_semantic_loss"
-)
-
-BASE_WEIGHT_SAVE_PATHS=(
-  "save_weight/us_earthquake_semantic_loss"
-)
+BASE_DATASET_PATHS=("data/us_earthquake")
+BASE_RESULT_PATHS=("result/us_earthquake_semantic_loss")
+BASE_MODEL_LOAD_PATHS=("save_model/us_earthquake_semantic_loss")
+BASE_WEIGHT_SAVE_PATHS=("save_weight/us_earthquake_semantic_loss")
 
 # Loss coefficient settings (Semantic Loss)
 BETA_SEMANTICS=(10000.0)
@@ -39,17 +34,25 @@ for seed in "${SEEDS[@]}"; do
   echo " STARTING EXPERIMENTS FOR SEED: $seed "
   echo "========================================="
 
-  # Loop through the indices of the experiment arrays
   for i in "${!BASE_RESULT_PATHS[@]}"; do
     
     # Set up variables
     DATASET_PATH="${BASE_DATASET_PATHS[$i]}"
     CUR_BETA_S="${BETA_SEMANTICS[$i]}"
     
-    # Generate paths (Create a folder for the coefficient, and a seed-specific directory inside it)
-    CUR_RESULT="${BASE_RESULT_PATHS[$i]}/beta_${CUR_BETA_S}/seed_${seed}"
-    CUR_WEIGHT="${BASE_WEIGHT_SAVE_PATHS[$i]}/beta_${CUR_BETA_S}/seed_${seed}"
-    CUR_MODEL_LOAD="${BASE_MODEL_LOAD_PATHS[$i]}/beta_${CUR_BETA_S}/seed_${seed}"
+    # ★ Branch directory structure based on the embedding method
+    if [ "$TEMP_EMB_TYPE" = "MLP" ]; then
+        # Create a beta sub-directory for MLP
+        SUB_DIR="mlp/beta_${CUR_BETA_S}/seed_${seed}"
+    else
+        # Omit the beta sub-directory for positional (TPE)
+        SUB_DIR="positional/seed_${seed}"
+    fi
+    
+    # Assemble the final paths
+    CUR_RESULT="${BASE_RESULT_PATHS[$i]}/${SUB_DIR}"
+    CUR_WEIGHT="${BASE_WEIGHT_SAVE_PATHS[$i]}/${SUB_DIR}"
+    CUR_MODEL_LOAD="${BASE_MODEL_LOAD_PATHS[$i]}/${SUB_DIR}"
     
     # Create directories
     mkdir -p "$CUR_RESULT" "$CUR_WEIGHT" "$CUR_MODEL_LOAD"
@@ -57,7 +60,7 @@ for seed in "${SEEDS[@]}"; do
     echo "-------------------------------------------------------"
     echo " Running Experiment Index: $i (Seed: $seed)"
     echo " Dataset: $DATASET_PATH"
-    echo " Beta Semantic: $CUR_BETA_S"
+    echo " Emb Type: $TEMP_EMB_TYPE"
     echo " Output Dir: $CUR_RESULT"
     echo "-------------------------------------------------------"
 
@@ -69,10 +72,9 @@ for seed in "${SEEDS[@]}"; do
       --result_save_path="${CUR_RESULT}" \
       --model_weight_path="${CUR_MODEL_LOAD}" \
       --weight_path="${CUR_WEIGHT}" \
+      --beta_semantic="${CUR_BETA_S}" \
       --seed="${seed}" \
-      --beta_semantic="${CUR_BETA_S}"
-
-    echo ">>> Experiment $i (Seed: $seed, Beta: $CUR_BETA_S) Completed."
-    echo ""
+      --temporal_emb_type="${TEMP_EMB_TYPE}"
+      
   done
 done

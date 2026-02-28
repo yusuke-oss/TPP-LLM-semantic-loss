@@ -13,6 +13,7 @@ Building upon the [original TPP-LLM framework](https://arxiv.org/abs/2410.02062)
 
 - **Continuous Value Embedding via MLPs**: Directly encodes continuous numerical features (Magnitude, Depth, Time) using specialized MLP encoders, avoiding the precision loss typical in standard tokenization methods.
 - **Semantic Alignment Loss (`beta_semantic`)**: Introduces a custom MSE-based loss function that aligns the output vectors of the MLPs with the pre-trained word embeddings (Frozen Target Anchors) of their respective concepts. This ensures the LLM intuitively "understands" the numerical scales.
+- **Dynamic Token & Prompt Management**: Automatically controls the insertion of structural/delimiter tokens (e.g., `<|time_prefix|>`) and dynamically adjusts the LLM's system prompts based on the selected embedding strategy (Proposed MLP vs. Baseline TPE).
 - **Parameter-Efficient Fine-Tuning**: Utilizes Low-Rank Adaptation (LoRA) to efficiently fine-tune the LLM for temporal modeling, reducing computational costs while keeping the base LLM frozen.
 - **Comprehensive Evaluation & Visualization**: Includes robust tools to automatically generate:
   - Epoch-by-epoch Normalized Confusion Matrices.
@@ -53,8 +54,8 @@ For easy reproducibility and immediate evaluation, we provide the fully processe
 │       ├── model.py             # Core model with MLP encoders and Semantic Loss
 │       ├── runner.py            # Training loop and evaluation logic
 │       ├── data.py              # Dataset loader and global statistics calculator
-│       ├── layers.py            # Temporal Positional Encoding
-│       ├── utils.py             # Prompt generation for event sequences
+│       ├── layers.py            # Temporal Positional Encoding (Baseline)
+│       ├── utils.py             # Dynamic prompt generation for event sequences
 │       ├── common_utils.py      # Reproducibility (Seed) utilities
 │       └── analysis.py          # Visualization and quantitative metric tools
 ├── tpp-llm_us.sh                # Execution script (runs multiple seeds & betas automatically)
@@ -104,16 +105,22 @@ This project utilizes the U.S. Earthquake dataset (2020-2024). We provide a comp
 ## 🚀 Usage
 
 ### ⚙️ Configuring the Execution Script (`tpp-llm_us.sh`)
-We provide a bash script to automate training and evaluation across multiple configurations. Before running the script, open `tpp-llm_us.sh` to configure the random seeds and loss coefficients you want to test:
+We provide a bash script to automate training and evaluation across multiple configurations. Before running the script, open `tpp-llm_us.sh` to configure the experimental mode and random seeds:
 
 ```bash
+# Toggle between the proposed method and the baseline
+TEMP_EMB_TYPE="MLP"  # Use "MLP" for Semantic Loss, or "positional" for baseline TPE
+
 # Set the random seeds for robust evaluation
 SEEDS=(42 123 501 1000 2025)
 
-# Set the Semantic Loss coefficients (beta) to test
+# Set the Semantic Loss coefficients (beta) to test (used only if TEMP_EMB_TYPE="MLP")
 BETA_SEMANTICS=(10000.0) 
 ```
-The script automatically builds the hierarchical directory structure (`.../beta_10000.0/seed_42/`) and executes the Python script for each combination.
+
+The script automatically overrides the `.config` file and builds a clean, hierarchical directory structure to prevent overwriting results:
+- **MLP Mode**: `.../mlp/beta_10000.0/seed_42/`
+- **Baseline Mode**: `.../positional/seed_42/`
 
 ### 🎯 Execution Modes (Choose One)
 The behavior of the training script is controlled by **mutually exclusive** execution flags. You must select exactly one mode at the bottom of your configuration file (`configs/tpp_llm_ue.config`):
@@ -121,6 +128,7 @@ The behavior of the training script is controlled by **mutually exclusive** exec
 * `--save_flag`: Trains the model from scratch, evaluates it, and saves the best weights locally.
 * `--train_flag`: Trains and evaluates the model, but does *not* save the weights (useful for debugging).
 * `--load_flag`: Skips training, loads pre-trained weights from your local paths, and runs evaluation directly.
+
 ---
 
 ### Case 1: Training from Scratch and Saving
@@ -135,9 +143,9 @@ To train the model from scratch and save the best weights locally:
 ### Case 2: Evaluating a Pre-trained Model
 If you downloaded our pre-trained weights from Hugging Face, you can evaluate them directly on the test set without training.
 
-1. **Place the downloaded weights** into their corresponding local directories. For example, for `seed=42` and `beta_semantic=10000.0`, ensure the files are extracted like this:
-   * `save_model/us_earthquake_semantic_loss/beta_10000.0/seed_42/` *(Contains LoRA & Tokenizer)*
-   * `save_weight/us_earthquake_semantic_loss/beta_10000.0/seed_42/` *(Contains TPP Prediction Heads)*
+1. **Place the downloaded weights** into their corresponding local directories. For example, for `seed=42`, `TEMP_EMB_TYPE="MLP"`, and `beta_semantic=10000.0`, ensure the files are extracted like this:
+   * `save_model/us_earthquake_semantic_loss/mlp/beta_10000.0/seed_42/` *(Contains LoRA & Tokenizer)*
+   * `save_weight/us_earthquake_semantic_loss/mlp/beta_10000.0/seed_42/` *(Contains TPP Prediction Heads)*
    *(Ensure your dataset is also placed in `data/us_earthquake/`)*
 
 2. **Update the config file** (`configs/tpp_llm_ue.config`):
@@ -163,7 +171,7 @@ After running experiments across multiple seeds, you can automatically extract t
 python analysis/process_results.py
 ```
 
-This will generate a summary text file (e.g., `beta_10000.0_summary.txt`) in your results directory containing the compiled statistics.
+This will generate a summary text file (e.g., `mlp_beta_10000.0_summary.txt`) in your results directory containing the compiled statistics.
 
 ## 📝 Citation
 
@@ -177,7 +185,7 @@ If you find this code or the original TPP-LLM framework useful in your research,
       eprint={2410.02062},
       archivePrefix={arXiv},
       primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2410.02062}, 
+      url={[https://arxiv.org/abs/2410.02062](https://arxiv.org/abs/2410.02062)}, 
 }
 ```
 

@@ -27,7 +27,6 @@ torch.autograd.set_detect_anomaly(True)
 
 
 if __name__ == '__main__':
-    # ... (argparse部分は変更なし) ...
     parser = argparse.ArgumentParser(
         fromfile_prefix_chars='@',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -115,11 +114,16 @@ if __name__ == '__main__':
     val_log_path = os.path.join(args.result_save_path, 'val.txt')
     with open(val_log_path, 'a') as f:
         f.write(f"Seed: {args.seed}\n")
-        f.write(f"Beta Semantic: {args.beta_semantic}\n")
+        if args.temporal_emb_type=='MLP':
+            f.write(f"Beta Semantic: {args.beta_semantic}\n")
     
     # Prompt Preparation
     base_dataset_name = os.path.basename(args.dataset_path).replace('_few_shot', '')
-    prompt = get_prompt(dataset_name=base_dataset_name, event_time_first=args.temporal_emb_first)
+    prompt = get_prompt(
+        dataset_name=base_dataset_name, 
+        event_time_first=args.temporal_emb_first,
+        temporal_emb_type=args.temporal_emb_type
+    )
     if args.no_prompt:
         prompt = ''
     

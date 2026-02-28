@@ -20,7 +20,6 @@ class TPPLLMDataset(Dataset):
     def __getitem__(self, idx):
         return self.data[idx]
 
-# ▼▼▼ 修正版 collate_fn (CDF対応) ▼▼▼
 def collate_fn(batch: dict) -> dict:
     """
     batch: items in a batch
@@ -39,7 +38,6 @@ def collate_fn(batch: dict) -> dict:
     }
 
 def create_few_shot_dataset(data_dir, output_dir, few_shot_ratio=0.1, seed=0) -> None:
-    # (変更なし)
     random.seed(seed)
     train_file = os.path.join(data_dir, 'train.json')
     dev_file = os.path.join(data_dir, 'dev.json')
@@ -58,9 +56,9 @@ def create_few_shot_dataset(data_dir, output_dir, few_shot_ratio=0.1, seed=0) ->
 
 def get_all_data_stats(dataset_dir):
     """
-    Train/Val/Test すべてのファイルを読み込んで、データセット全体の
-    「最大値」と「最小値」を計算する関数。
-    マグニチュード、深さ、時刻に加えて「時間差 (Delta)」も計算。
+    Reads all Train/Val/Test files and calculates the global 
+    'maximum' and 'minimum' values across the entire dataset.
+    Calculates 'time difference (Delta)' in addition to magnitude, depth, and time.
     """
     print(f"Calculating global stats (min/max) from all files in {dataset_dir}...")
 
