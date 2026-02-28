@@ -197,7 +197,7 @@ If you have any questions or encounter any issues, please feel free to [submit a
 
 ## 🙏 Acknowledgment
 
-We sincerely thank the authors of the original **[TPP-LLM](https://github.com/zefang-liu/TPP-LLM)** for their excellent contribution to the field of event sequence prediction. We would also like to thank the developers of [EasyTPP](https://github.com/ant-research/EasyTemporalPointProcess) for their valuable implementation of TPPs.
+We sincerely thank the authors of the original **[TPP-LLM](https://github.com/zefang-liu/TPP-LLM)** for their excellent contribution to the field of event sequence prediction. 
 
 ## 📜 License
 
