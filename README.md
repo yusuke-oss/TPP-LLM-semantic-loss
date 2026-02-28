@@ -39,6 +39,8 @@ For easy reproducibility and immediate evaluation, we provide the fully processe
 │   └── tpp_llm_ue.config        # Configuration file for US Earthquake experiments
 ├── data/
 │   └── us_earthquake/           # Processed datasets (train.json, dev.json, test.json)
+├──file_sh/
+    └── tpp-llm_us.sh            # Execution script (runs multiple seeds & betas automatically)
 ├── images/
 │   └── tpp-llm_semantic_loss.png # Architecture diagrams
 ├── notebooks/
@@ -58,7 +60,6 @@ For easy reproducibility and immediate evaluation, we provide the fully processe
 │       ├── utils.py             # Dynamic prompt generation for event sequences
 │       ├── common_utils.py      # Reproducibility (Seed) utilities
 │       └── analysis.py          # Visualization and quantitative metric tools
-├── tpp-llm_us.sh                # Execution script (runs multiple seeds & betas automatically)
 ├── requirements.txt             # Strict version dependencies for reproducibility
 └── .gitignore                   # Keeps heavy model weights and caches out of the repository
 ```
