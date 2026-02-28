@@ -39,7 +39,7 @@ For easy reproducibility and immediate evaluation, we provide the fully processe
 │   └── tpp_llm_ue.config        # Configuration file for US Earthquake experiments
 ├── data/
 │   └── us_earthquake/           # Processed datasets (train.json, dev.json, test.json)
-├──file_sh/
+├── file_sh/
 │   └── tpp-llm_us.sh            # Execution script (runs multiple seeds & betas automatically)
 ├── images/
 │   └── tpp-llm_semantic_loss.png # Architecture diagrams
@@ -70,7 +70,7 @@ To ensure full reproducibility of the results reported in this project, please i
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yusuke-oss/TPP-LLM-semantic-loss.git
+   git clone [https://github.com/yusuke-oss/TPP-LLM-semantic-loss.git](https://github.com/yusuke-oss/TPP-LLM-semantic-loss.git)
    cd TPP-LLM-semantic-loss
    ```
 
@@ -92,8 +92,12 @@ To ensure full reproducibility of the results reported in this project, please i
 
 ## 📊 Dataset Preparation (U.S. Earthquake)
 
-This project utilizes the U.S. Earthquake dataset (2020-2024). We provide a complete Jupyter Notebook to download and preprocess the raw data from the USGS API automatically.
+**⚠️ Important Note on Reproducibility:**
+We highly recommend downloading the pre-processed dataset directly from **[Hugging Face](https://huggingface.co/datasets/yyyxz12047/TPP-LLM-semantic-loss)** and placing it into the `data/us_earthquake/` directory. Because the USGS Earthquake API is continuously updated, running the notebook today will yield a different raw dataset than the one used for our original experiments and pre-trained models.
 
+The notebook is provided primarily for reference, or for users who wish to collect entirely new, up-to-date earthquake data.
+
+If you still wish to run the data pipeline from scratch:
 1. Open `notebooks/tpp_data.ipynb` in Jupyter or VS Code.
 2. Run all cells. The notebook will:
    - Download raw CSV data via the USGS Earthquake API.
@@ -136,7 +140,7 @@ To train the model from scratch and save the best weights locally:
 1. Open `configs/tpp_llm_ue.config` and ensure **only** `--save_flag` is present at the bottom.
 2. Run the provided bash script:
    ```bash
-   bash tpp-llm_us.sh
+   bash file_sh/tpp-llm_us.sh
    ```
 
 ### Case 2: Evaluating a Pre-trained Model
@@ -160,7 +164,7 @@ If you downloaded our pre-trained weights from Hugging Face, you can evaluate th
 
 3. **Run the script**:
    ```bash
-   bash tpp-llm_us.sh
+   bash file_sh/tpp-llm_us.sh
    ```
 
 ### 📈 Aggregating Results
@@ -185,7 +189,7 @@ If you find this code or the original TPP-LLM framework useful in your research,
       eprint={2410.02062},
       archivePrefix={arXiv},
       primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2410.02062}, 
+      url={[https://arxiv.org/abs/2410.02062](https://arxiv.org/abs/2410.02062)}, 
 }
 ```
 
