@@ -7,10 +7,10 @@ import collections
 
 def find_best_epoch(val_file_path):
     """
-    Parses the val.txt file to find the epoch number corresponding to 
-    the last occurrence of "new best validation metrics".
+    Parses the val.txt file to find the best epoch.
+    If 'new best validation metrics' is found (Training mode), returns the epoch number.
+    If only 'validation metrics: {' is found (Loaded mode), returns 'loaded'.
     """
-    best_epoch = -1
     epoch_pattern = re.compile(r"validation metrics of epoch (\d+):")
     
     try:
@@ -25,8 +25,12 @@ def find_best_epoch(val_file_path):
 
     new_best_indices = [m.start() for m in re.finditer("new best validation metrics", content)]
     
+    # If no "new best" is found, check if it's a loaded model (only initial validation)
     if not new_best_indices:
-        print(f"  [Warning] 'new best validation metrics' not found in {val_file_path}.")
+        if "validation metrics: {" in content:
+            return "loaded"
+        
+        print(f"  [Warning] Neither 'new best validation metrics' nor loaded metrics found in {val_file_path}.")
         return None
         
     last_best_index = new_best_indices[-1]
@@ -42,9 +46,15 @@ def find_best_epoch(val_file_path):
 
 def get_test_metrics(test_file_path, epoch):
     """
-    Parses the test.txt file to extract metrics for the specified epoch.
+    Parses the test.txt file to extract metrics.
+    Handles both trained models (epoch target) and pre-loaded models.
     """
-    metric_pattern = re.compile(rf"test metrics of epoch {epoch}: ({{.*}})")
+    if epoch == "loaded":
+        # For loaded models, the log is simply "test metrics: {...}"
+        metric_pattern = re.compile(r"test metrics: (\{.*\})")
+    else:
+        # For trained models, the log includes the epoch number
+        metric_pattern = re.compile(rf"test metrics of epoch {epoch}: (\{{.*\}})")
     
     try:
         with open(test_file_path, 'r', encoding='utf-8') as f:
@@ -65,7 +75,7 @@ def get_test_metrics(test_file_path, epoch):
         print(f"  [Error] Failed while processing {test_file_path} - {e}")
         return None
         
-    print(f"  [Warning] Metrics for epoch {epoch} not found in {test_file_path}.")
+    print(f"  [Warning] Metrics for epoch '{epoch}' not found in {test_file_path}.")
     return None
 
 def process_experiment_group(runs_list):
@@ -90,7 +100,10 @@ def process_experiment_group(runs_list):
             print(f"  Failed to identify the best epoch for seed {seed}.")
             continue
             
-        print(f"  Best Epoch: {best_epoch}")
+        if best_epoch == "loaded":
+            print(f"  Mode: Loaded Model (Pre-trained)")
+        else:
+            print(f"  Best Epoch: {best_epoch}")
         
         test_metrics = get_test_metrics(test_file, best_epoch)
         if test_metrics is None:
@@ -170,48 +183,57 @@ def summarize_results(results, output_file=None, exp_name=""):
 
 
 def main():
-    # Modified: Change the base search directory to the root folder
-    base_search_dir = "result/us_earthquake_semantic_loss"
+    # =========================================================
+    # ★ Experiment Mode Switch
+    # Change to "MLP" or "positional" to process specific results
+    # =========================================================
+    TARGET_EMB_TYPE = "MLP" 
     
-    # Set the output directory to the same location
+    # Base directory for all experiments
+    root_dir = "result/us_earthquake_semantic_loss"
+    
+    # The specific directory to scan based on the selected mode
+    base_search_dir = os.path.join(root_dir, TARGET_EMB_TYPE.lower())
+    
+    # Output directory for the summary text files
     output_summary_dir = base_search_dir
     
-    # For regex pattern matching
+    # For regex pattern matching of seed folders
     seed_pattern = re.compile(r"^seed_(\d+)$")
     experiment_groups = collections.defaultdict(list)
     
-    print(f"Recursively scanning '{base_search_dir}' using os.walk...")
+    print(f"Recursively scanning '{base_search_dir}'...")
     found_any_seeds = False
 
     try:
         # Recursively traverse directories
-        for root, dirs, files in os.walk(base_search_dir, topdown=True, followlinks=False):
+        for current_root, dirs, files in os.walk(base_search_dir, topdown=True, followlinks=False):
 
             # Find folders that contain both 'val.txt' and 'test.txt' (completed seed folders)
             if 'val.txt' in files and 'test.txt' in files:
                 
-                seed_folder_name = os.path.basename(root)
+                seed_folder_name = os.path.basename(current_root)
                 match = seed_pattern.match(seed_folder_name)
                 
                 if match:
                     seed = int(match.group(1))
                     
-                    # Modified: Use the relative path between the root folder and the seed folder as the experiment group name
-                    # Example: Extract "mlp/beta_10000.0" or "positional"
-                    parent_dir_path = os.path.dirname(root)
-                    rel_path = os.path.relpath(parent_dir_path, base_search_dir)
+                    # Use the relative path from the root_dir to the seed folder's parent
+                    # Example: "mlp/beta_10000.0" or "positional"
+                    parent_dir_path = os.path.dirname(current_root)
+                    rel_path = os.path.relpath(parent_dir_path, root_dir)
                     
-                    # Replace directory separators (e.g., '/') with underscores ('_') to make it a safe filename
+                    # Replace directory separators with underscores for a safe filename
                     exp_name = rel_path.replace(os.sep, '_')
                     
                     experiment_groups[exp_name].append({
                         'seed': seed,
-                        'path': root
+                        'path': current_root
                     })
                     found_any_seeds = True
 
     except FileNotFoundError:
-        print(f"[Error] Target directory '{base_search_dir}' not found.")
+        print(f"[Error] Target directory '{base_search_dir}' not found. Have you run the training script yet?")
         return
     except Exception as e:
         print(f"[Error] A problem occurred while scanning directories - {e}")
@@ -233,7 +255,7 @@ def main():
         results = process_experiment_group(runs_list)
         
         if results:
-            # Example: Output as "mlp_beta_10000.0_summary.txt" or "positional_summary.txt"
+            # Output as "mlp_beta_10000.0_summary.txt" or "positional_summary.txt"
             output_filename = os.path.join(output_summary_dir, f"{exp_name}_summary.txt")
             summarize_results(results, output_filename, exp_name)
         else:

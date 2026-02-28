@@ -271,6 +271,8 @@ class TPPLLMModel(nn.Module):
         all_time_vals, all_mag_vals, all_dep_vals = [], [], []
         aux_data=[]
         
+        self.use_tokens=(self.temporal_emb_type== 'MLP')
+
         # Process each event sequence in the batch
         for event_times, event_texts,event_mag,event_dep  in zip(batch_event_times,
                                                                batch_event_texts,batch_event_mag,batch_event_dep):

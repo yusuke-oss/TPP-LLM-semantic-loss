@@ -35,7 +35,7 @@ For easy reproducibility and immediate evaluation, we provide the fully processe
 ```text
 .
 ├── analysis/
-│   └── process_results.py       # Script to extract and summarize best-epoch metrics across seeds
+│   └── process_results.py       # Script to extract and summarize metrics across seeds
 ├── configs/
 │   └── tpp_llm_ue.config        # Configuration file for US Earthquake experiments
 ├── data/
@@ -44,6 +44,7 @@ For easy reproducibility and immediate evaluation, we provide the fully processe
 │   └── tpp-llm_semantic_loss.png # Architecture diagrams
 ├── notebooks/
 │   └── tpp_data.ipynb           # Data download and preprocessing pipeline (USGS API)
+├── result/                      # ⚠️ Generated locally: Training logs, metrics, and visualization plots
 ├── save_model/                  # ⚠️ Generated locally: Saved LoRA adapters (Ignored by Git)
 ├── save_weight/                 # ⚠️ Generated locally: Merged model weights (Ignored by Git)
 ├── scripts/
@@ -165,11 +166,12 @@ If you downloaded our pre-trained weights from Hugging Face, you can evaluate th
    ```
 
 ### 📈 Aggregating Results
-After running experiments across multiple seeds, you can automatically extract the best epoch from the validation logs and aggregate the final test metrics (Mean ± StdDev) by running:
+After running experiments across multiple seeds, you can automatically aggregate the final test metrics (Mean ± StdDev) by running:
 
 ```bash
 python analysis/process_results.py
 ```
+**Note:** The script dynamically supports both trained models (automatically extracting the best epoch from validation logs) and pre-trained evaluated models (extracting final test metrics from loaded weights).
 
 This will generate a summary text file (e.g., `mlp_beta_10000.0_summary.txt`) in your results directory containing the compiled statistics.
 
