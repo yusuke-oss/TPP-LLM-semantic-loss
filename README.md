@@ -70,7 +70,7 @@ To ensure full reproducibility of the results reported in this project, please i
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/yusuke-oss/TPP-LLM-semantic-loss.git](https://github.com/yusuke-oss/TPP-LLM-semantic-loss.git)
+   git clone https://github.com/yusuke-oss/TPP-LLM-semantic-loss.git
    cd TPP-LLM-semantic-loss
    ```
 
@@ -189,7 +189,7 @@ If you find this code or the original TPP-LLM framework useful in your research,
       eprint={2410.02062},
       archivePrefix={arXiv},
       primaryClass={cs.LG},
-      url={[https://arxiv.org/abs/2410.02062](https://arxiv.org/abs/2410.02062)}, 
+      url={https://arxiv.org/abs/2410.02062}, 
 }
 ```
 
