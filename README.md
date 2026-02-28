@@ -93,7 +93,7 @@ To ensure full reproducibility of the results reported in this project, please i
 ## 📊 Dataset Preparation (U.S. Earthquake)
 
 **⚠️ Important Note on Reproducibility:**
-We highly recommend downloading the pre-processed dataset directly from **[Hugging Face](https://huggingface.co/datasets/yyyxz12047/TPP-LLM-semantic-loss)** and placing it into the `data/us_earthquake/` directory. Because the USGS Earthquake API is continuously updated, running the notebook today will yield a different raw dataset than the one used for our original experiments and pre-trained models.
+We highly recommend downloading the pre-processed dataset directly from **[Hugging Face](https://huggingface.co/datasets/yusuke-oss/TPP-LLM-semantic-loss)** and placing it into the `data/us_earthquake/` directory. Because the USGS Earthquake API is continuously updated, running the notebook today will yield a different raw dataset than the one used for our original experiments and pre-trained models.
 
 The notebook is provided primarily for reference, or for users who wish to collect entirely new, up-to-date earthquake data.
 
