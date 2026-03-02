@@ -90,6 +90,45 @@ To ensure full reproducibility of the results reported in this project, please i
    export PYTHONPATH=$PYTHONPATH:src
    ```
 
+## 🚀 Quick Start (Automated Download)
+
+To quickly reproduce our results, you can automatically download the pre-processed dataset and pre-trained model weights directly from Hugging Face. *(Note: Ensure `git-lfs` is installed on your system to download model weights properly).*
+
+Run the following command block in your terminal from the root `TPP-LLM-semantic-loss` directory:
+
+```bash
+# ==========================================
+# 1. Download and setup the Dataset
+# ==========================================
+# Clone the dataset repository to a temporary folder
+git clone https://huggingface.co/datasets/yusuke-oss/TPP-LLM-semantic-loss hf_dataset
+
+# Create the target directory
+mkdir -p data
+
+# Copy the dataset folder preserving the structure
+cp -r hf_dataset/data/* data/ 2>/dev/null || true
+
+# Remove the temporary folder
+rm -rf hf_dataset
+
+# ==========================================
+# 2. Download and setup Pre-trained Weights
+# ==========================================
+# Clone the model repository to a temporary folder
+git clone https://huggingface.co/yusuke-oss/TPP-LLM-semantic-loss hf_model
+
+# Create the target directories
+mkdir -p save_model save_weight
+
+# Copy the model and weight files
+cp -r hf_model/save_model/* save_model/ 2>/dev/null || true
+cp -r hf_model/save_weight/* save_weight/ 2>/dev/null || true
+
+# Remove the temporary folder
+rm -rf hf_model
+```
+
 ## 📊 Dataset Preparation (U.S. Earthquake)
 
 **⚠️ Important Note on Reproducibility:**

@@ -121,7 +121,7 @@ def perform_quantitative_analysis(
     Evaluate quantitative metrics (Confusion Matrix, RMSE, Classification Report).
     Results are saved neatly in the detailed analysis directory by epoch.
     """
-    print(f"--- Running Quantitative Analysis ({phase_name} - Epoch {epoch}) ---")
+    #print(f"--- Running Quantitative Analysis ({phase_name} - Epoch {epoch}) ---")
     
     # Create an epoch-specific directory within the detailed metrics folder
     quant_dir = os.path.join(result_save_path, "analysis", f"detail/epoch_{epoch}/{phase_name}")
@@ -188,7 +188,7 @@ def perform_quantitative_analysis(
     # 4. Save Logs
     try:
         combined_log = analysis_log_time + "\n" + analysis_log_report
-        print(combined_log)
+        #print(combined_log)
         
         with open(os.path.join(quant_dir, f'analysis_report.txt'), 'w') as f:
             f.write(combined_log)
