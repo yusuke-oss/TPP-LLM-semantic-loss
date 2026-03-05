@@ -38,7 +38,7 @@ For easy reproducibility and immediate evaluation, we provide the fully processe
 ├── configs/
 │   └── tpp_llm_ue.config        # Configuration file for US Earthquake experiments
 ├── data/
-│   └── us_earthquake/           # Processed datasets (train.json, dev.json, test.json)
+│   └── us_earthquake/           # ⚠️ Generated locally: Processed datasets (train.json, dev.json, test.json)
 ├── file_sh/
 │   └── tpp-llm_us.sh            # Execution script (runs multiple seeds & betas automatically)
 ├── images/
@@ -104,7 +104,7 @@ Run the following command block in your terminal from the root `TPP-LLM-semantic
 git clone https://huggingface.co/datasets/yusuke-oss/TPP-LLM-semantic-loss hf_dataset
 
 # Create the target directory
-mkdir -p data
+mkdir data
 
 # Copy the dataset folder preserving the structure
 cp -r hf_dataset/data/* data/ 2>/dev/null || true
@@ -119,7 +119,7 @@ rm -rf hf_dataset
 git clone https://huggingface.co/yusuke-oss/TPP-LLM-semantic-loss hf_model
 
 # Create the target directories
-mkdir -p save_model save_weight
+mkdir save_model save_weight
 
 # Copy the model and weight files
 cp -r hf_model/save_model/* save_model/ 2>/dev/null || true
